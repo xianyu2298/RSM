@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.PersonMapper">
+
+    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
+        SELECT id, emp_no, name, gender, title, department, phone, email, hire_date, remark
+        FROM research_person
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
+        SELECT id, emp_no, name, gender, title, department, phone, email, hire_date, remark
+        FROM research_person
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_person(emp_no, name, gender, title, department, phone, email, hire_date, remark)
+        VALUES (#{empNo}, #{name}, #{gender}, #{title}, #{department}, #{phone}, #{email}, #{hireDate}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE research_person
+        SET emp_no=#{empNo}, name=#{name}, gender=#{gender}, title=#{title}, department=#{department},
+            phone=#{phone}, email=#{email}, hire_date=#{hireDate}, remark=#{remark}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM research_person WHERE id = #{id}
+    </delete>
+
+</mapper>

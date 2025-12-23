@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.DictMapper">
+
+    <select id="listItemsByType" resultType="edu.jjxy.researchmanagementsystem.entity.DictItem">
+        SELECT id, type_code, item_code, item_name, status, sort_no
+        FROM sys_dict_item
+        WHERE type_code = #{typeCode} AND status = 1
+        ORDER BY sort_no ASC, id ASC
+    </select>
+
+</mapper>
