@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.AwardMapper">
+
+    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Award">
+        SELECT id, project_id, award_name, award_level, award_org, award_date, remark
+        FROM research_award
+        <where>
+            <if test="awardName != null and awardName != ''">
+                AND award_name LIKE CONCAT('%', #{awardName}, '%')
+            </if>
+            <if test="projectId != null">
+                AND project_id = #{projectId}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Award">
+        SELECT id, project_id, award_name, award_level, award_org, award_date, remark
+        FROM research_award WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_award(project_id, award_name, award_level, award_org, award_date, remark)
+        VALUES (#{projectId}, #{awardName}, #{awardLevel}, #{awardOrg}, #{awardDate}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE research_award
+        SET project_id=#{projectId}, award_name=#{awardName}, award_level=#{awardLevel},
+            award_org=#{awardOrg}, award_date=#{awardDate}, remark=#{remark}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM research_award WHERE id=#{id}
+    </delete>
+
+</mapper>

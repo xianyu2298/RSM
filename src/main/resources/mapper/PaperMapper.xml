@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.PaperMapper">
+
+    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Paper">
+        SELECT id, person_id, title, journal, index_code, publish_date, doi, remark
+        FROM research_paper
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="personId != null">
+                AND person_id = #{personId}
+            </if>
+            <if test="indexCode != null and indexCode != ''">
+                AND index_code = #{indexCode}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Paper">
+        SELECT id, person_id, title, journal, index_code, publish_date, doi, remark
+        FROM research_paper WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_paper(person_id, title, journal, index_code, publish_date, doi, remark)
+        VALUES (#{personId}, #{title}, #{journal}, #{indexCode}, #{publishDate}, #{doi}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE research_paper
+        SET person_id=#{personId}, title=#{title}, journal=#{journal},
+            index_code=#{indexCode}, publish_date=#{publishDate}, doi=#{doi}, remark=#{remark}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM research_paper WHERE id=#{id}
+    </delete>
+
+</mapper>
