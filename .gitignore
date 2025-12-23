@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/front/node_modules/
+/front/dist/
+/front/.vite/
