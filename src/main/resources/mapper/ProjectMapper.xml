@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.ProjectMapper">
+
+    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Project">
+        SELECT id, project_code, name, nature_code, scope_code, status_code,
+        start_date, end_date, leader_person_id, budget, remark
+        FROM research_project
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="natureCode != null and natureCode != ''">
+                AND nature_code = #{natureCode}
+            </if>
+            <if test="scopeCode != null and scopeCode != ''">
+                AND scope_code = #{scopeCode}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Project">
+        SELECT id, project_code, name, nature_code, scope_code, status_code,
+               start_date, end_date, leader_person_id, budget, remark
+        FROM research_project
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO research_project(project_code, name, nature_code, scope_code, status_code,
+                                     start_date, end_date, leader_person_id, budget, remark)
+        VALUES (#{projectCode}, #{name}, #{natureCode}, #{scopeCode}, #{statusCode},
+                #{startDate}, #{endDate}, #{leaderPersonId}, #{budget}, #{remark})
+    </insert>
+
+    <update id="update">
+        UPDATE research_project
+        SET project_code=#{projectCode},
+            name=#{name},
+            nature_code=#{natureCode},
+            scope_code=#{scopeCode},
+            status_code=#{statusCode},
+            start_date=#{startDate},
+            end_date=#{endDate},
+            leader_person_id=#{leaderPersonId},
+            budget=#{budget},
+            remark=#{remark}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM research_project WHERE id = #{id}
+    </delete>
+
+</mapper>
