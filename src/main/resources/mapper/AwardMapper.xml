@@ -4,18 +4,34 @@
 <mapper namespace="edu.jjxy.researchmanagementsystem.mapper.AwardMapper">
 
     <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Award">
-        SELECT id, project_id, award_name, award_level, award_org, award_date, remark
-        FROM research_award
+        SELECT
+        a.id,
+        a.project_id,
+        a.award_name,
+        a.award_level,
+        a.award_org,
+        a.award_date,
+        a.remark,
+        p.project_code AS projectCode,
+        p.name         AS projectName,
+        GROUP_CONCAT(DISTINCT CONCAT(rp.emp_no, '-', rp.name) SEPARATOR '，') AS awardPersons
+        FROM research_award a
+        LEFT JOIN research_project p ON p.id = a.project_id
+        LEFT JOIN research_project_member pm ON pm.project_id = a.project_id
+        LEFT JOIN research_person rp ON rp.id = pm.person_id
         <where>
-            <if test="awardName != null and awardName != ''">
-                AND award_name LIKE CONCAT('%', #{awardName}, '%')
-            </if>
             <if test="projectId != null">
-                AND project_id = #{projectId}
+                AND a.project_id = #{projectId}
+            </if>
+            <if test="awardName != null and awardName != ''">
+                AND a.award_name LIKE CONCAT('%', #{awardName}, '%')
             </if>
         </where>
-        ORDER BY id DESC
+        GROUP BY a.id
+        ORDER BY a.id DESC
     </select>
+
+
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Award">
         SELECT id, project_id, award_name, award_level, award_org, award_date, remark
@@ -37,5 +53,30 @@
     <delete id="deleteById">
         DELETE FROM research_award WHERE id=#{id}
     </delete>
+
+    <select id="listByPersonId" resultType="edu.jjxy.researchmanagementsystem.entity.Award">
+        SELECT
+            a.id,
+            a.project_id,
+            a.award_name,
+            a.award_level,
+            a.award_org,
+            a.award_date,
+            a.remark,
+            p.project_code AS projectCode,
+            p.name         AS projectName,
+            GROUP_CONCAT(DISTINCT CONCAT(rp2.emp_no, '-', rp2.name) SEPARATOR '，') AS awardPersons
+        FROM research_award a
+                 LEFT JOIN research_project p ON p.id = a.project_id
+                 LEFT JOIN research_project_member pm ON pm.project_id = a.project_id
+                 LEFT JOIN research_person rp ON rp.id = pm.person_id
+                 LEFT JOIN research_project_member pm2 ON pm2.project_id = a.project_id
+                 LEFT JOIN research_person rp2 ON rp2.id = pm2.person_id
+        WHERE rp.id = #{personId}
+        GROUP BY a.id
+        ORDER BY a.id DESC
+    </select>
+
+
 
 </mapper>

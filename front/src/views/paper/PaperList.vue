@@ -15,6 +15,14 @@
     <el-table :data="rows" style="margin-top:12px" border>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="personId" label="人员ID" width="90" />
+
+
+      <el-table-column label="作者" width="160">
+        <template #default="{ row }">
+          {{ row.empNo }} - {{ row.personName }}
+        </template>
+      </el-table-column>
+
       <el-table-column prop="title" label="标题" min-width="260" />
       <el-table-column prop="journal" label="期刊/会议" width="160" />
       <el-table-column prop="indexCode" label="检索源" width="120" />

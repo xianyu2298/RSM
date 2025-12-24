@@ -6,6 +6,8 @@ import edu.jjxy.researchmanagementsystem.entity.Project;
 import edu.jjxy.researchmanagementsystem.service.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/project")
 public class ProjectController {
@@ -46,4 +48,11 @@ public class ProjectController {
     public Result<Project> get(@PathVariable Long id) {
         return Result.ok(projectService.get(id));
     }
+
+    @GetMapping("/listByPersonId")
+    public Result<List<Project>> listByPersonId(@RequestParam Long personId) {
+        return Result.ok(projectService.listByPersonId(personId));
+    }
+
+
 }

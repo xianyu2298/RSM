@@ -8,6 +8,7 @@ import AwardList from '../views/award/AwardList.vue'
 import UserList from '../views/user/UserList.vue'
 import PasswordChange from '../views/user/PasswordChange.vue'
 import Login from '../views/Login.vue'
+import PersonDetail from '../views/person/PersonDetail.vue'
 
 // ✅ 新增：项目详情页
 import ProjectDetail from '../views/project/ProjectDetail.vue'
@@ -29,6 +30,8 @@ const routes = [
             { path: '/award', component: AwardList },
             { path: '/user', component: UserList },
             { path: '/password', component: PasswordChange },
+            { path: '/person/:id', component: () => import('../views/person/PersonDetail.vue') }
+
         ]
     }
 ]

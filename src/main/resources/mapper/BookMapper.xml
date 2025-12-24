@@ -4,18 +4,29 @@
 <mapper namespace="edu.jjxy.researchmanagementsystem.mapper.BookMapper">
 
     <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Book">
-        SELECT id, person_id, name, publisher, publish_date, isbn, remark
-        FROM research_book
+        SELECT
+        b.id,
+        b.person_id,
+        b.name,
+        b.publisher,
+        b.publish_date,
+        b.isbn,
+        b.remark,
+        rp.emp_no AS empNo,
+        rp.name   AS personName
+        FROM research_book b
+        LEFT JOIN research_person rp ON rp.id = b.person_id
         <where>
             <if test="name != null and name != ''">
-                AND name LIKE CONCAT('%', #{name}, '%')
+                AND b.name LIKE CONCAT('%', #{name}, '%')
             </if>
             <if test="personId != null">
-                AND person_id = #{personId}
+                AND b.person_id = #{personId}
             </if>
         </where>
-        ORDER BY id DESC
+        ORDER BY b.id DESC
     </select>
+
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Book">
         SELECT id, person_id, name, publisher, publish_date, isbn, remark

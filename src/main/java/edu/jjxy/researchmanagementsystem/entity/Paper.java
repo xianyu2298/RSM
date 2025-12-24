@@ -13,4 +13,6 @@ public class Paper {
     private LocalDate publishDate;
     private String doi;
     private String remark;
+    private String empNo;
+    private String personName;
 }

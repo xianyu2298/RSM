@@ -12,4 +12,8 @@ public class Award {
     private String awardOrg;
     private LocalDate awardDate;
     private String remark;
+    private String projectCode;
+    private String projectName;
+    private String awardPersons; // 获奖人（项目成员拼接）
+
 }

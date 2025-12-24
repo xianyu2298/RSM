@@ -25,12 +25,17 @@
       <el-table-column prop="department" label="部门" />
       <el-table-column prop="phone" label="电话" />
       <el-table-column prop="email" label="邮箱" />
+
+
+
       <el-table-column label="操作" width="180">
         <template #default="scope">
           <el-button size="small" @click="openEdit(scope.row)">编辑</el-button>
+          <el-button size="small" type="primary" @click="goDetail(scope.row.id)">详情</el-button>
           <el-button size="small" type="danger" @click="remove(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
+
     </el-table>
 
     <!-- 分页 -->
@@ -84,6 +89,12 @@
 import { ref, reactive, onMounted } from 'vue'
 import { pagePerson, addPerson, updatePerson, deletePerson } from '../../api/person'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const goDetail = (id) => router.push(`/person/${id}`)
+
+
 
 const query = reactive({
   page: 1,

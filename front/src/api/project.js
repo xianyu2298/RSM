@@ -5,3 +5,5 @@ export const projectAdd = (data) => http.post('/api/project', data)
 export const projectUpdate = (data) => http.put('/api/project', data)
 export const projectDelete = (id) => http.delete(`/api/project/${id}`)
 export const projectGet = (id) => http.get(`/api/project/${id}`)
+export const projectListByPersonId = (personId) =>
+    http.get('/api/project/listByPersonId', { params: { personId } })

@@ -8,6 +8,8 @@ import edu.jjxy.researchmanagementsystem.mapper.AwardMapper;
 import edu.jjxy.researchmanagementsystem.service.AwardService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AwardServiceImpl implements AwardService {
     private final AwardMapper mapper;
@@ -23,4 +25,8 @@ public class AwardServiceImpl implements AwardService {
     @Override public void update(Award a){ mapper.update(a); }
     @Override public void delete(Long id){ mapper.deleteById(id); }
     @Override public Award get(Long id){ return mapper.selectById(id); }
+    @Override
+    public List<Award> listByPersonId(Long personId) {
+        return mapper.listByPersonId(personId);
+    }
 }

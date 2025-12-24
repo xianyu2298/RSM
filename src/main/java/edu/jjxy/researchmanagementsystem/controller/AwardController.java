@@ -6,6 +6,8 @@ import edu.jjxy.researchmanagementsystem.entity.Award;
 import edu.jjxy.researchmanagementsystem.service.AwardService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/award")
 public class AwardController {
@@ -24,4 +26,8 @@ public class AwardController {
     @PutMapping public Result<Void> update(@RequestBody Award a){ service.update(a); return Result.ok(null); }
     @DeleteMapping("/{id}") public Result<Void> delete(@PathVariable Long id){ service.delete(id); return Result.ok(null); }
     @GetMapping("/{id}") public Result<Award> get(@PathVariable Long id){ return Result.ok(service.get(id)); }
+    @GetMapping("/listByPersonId")
+    public Result<List<Award>> listByPersonId(@RequestParam Long personId) {
+        return Result.ok(service.listByPersonId(personId));
+    }
 }

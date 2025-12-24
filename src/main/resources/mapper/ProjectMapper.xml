@@ -18,7 +18,6 @@
                 AND scope_code = #{scopeCode}
             </if>
         </where>
-        ORDER BY id DESC
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Project">
@@ -53,5 +52,13 @@
     <delete id="deleteById">
         DELETE FROM research_project WHERE id = #{id}
     </delete>
+
+    <select id="listByPersonId" resultType="edu.jjxy.researchmanagementsystem.entity.Project">
+        SELECT p.*
+        FROM research_project p
+                 LEFT JOIN research_project_member pm ON pm.project_id = p.id
+        WHERE pm.person_id = #{personId}
+        ORDER BY p.id DESC
+    </select>
 
 </mapper>

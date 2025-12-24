@@ -14,4 +14,6 @@ public interface ProjectMapper {
     int update(Project p);
     int deleteById(@Param("id") Long id);
     Project selectById(@Param("id") Long id);
+    List<Project> listByPersonId(@Param("personId") Long personId);
+
 }

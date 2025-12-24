@@ -10,4 +10,5 @@ public interface AwardMapper {
     int update(Award a);
     int deleteById(@Param("id") Long id);
     Award selectById(@Param("id") Long id);
+    List<Award> listByPersonId(@Param("personId") Long personId);
 }

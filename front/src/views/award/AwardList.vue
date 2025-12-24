@@ -11,7 +11,10 @@
     <el-table :data="rows" style="margin-top:12px" border>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="projectId" label="项目ID" width="90" />
+      <el-table-column prop="projectCode" label="项目编号" width="140" />
+      <el-table-column prop="projectName" label="项目名称" />
       <el-table-column prop="awardName" label="奖项名称" min-width="220" />
+      <el-table-column prop="awardPersons" label="获奖人（项目成员）" width="260" />
       <el-table-column prop="awardLevel" label="级别" width="120" />
       <el-table-column prop="awardOrg" label="授奖单位" width="180" />
       <el-table-column prop="awardDate" label="获奖日期" width="120" />

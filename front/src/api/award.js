@@ -5,3 +5,5 @@ export const awardAdd = (data) => http.post('/api/award', data)
 export const awardUpdate = (data) => http.put('/api/award', data)
 export const awardDelete = (id) => http.delete(`/api/award/${id}`)
 export const awardGet = (id) => http.get(`/api/award/${id}`)
+export const awardListByPersonId = (personId) =>
+    http.get('/api/award/listByPersonId', { params: { personId } })

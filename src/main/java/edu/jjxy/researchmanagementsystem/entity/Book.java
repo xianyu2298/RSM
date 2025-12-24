@@ -12,4 +12,7 @@ public class Book {
     private LocalDate publishDate;
     private String isbn;
     private String remark;
+    private String empNo;
+    private String personName;
+
 }

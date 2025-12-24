@@ -8,6 +8,8 @@ import edu.jjxy.researchmanagementsystem.mapper.ProjectMapper;
 import edu.jjxy.researchmanagementsystem.service.ProjectService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
@@ -44,4 +46,10 @@ public class ProjectServiceImpl implements ProjectService {
     public Project get(Long id) {
         return projectMapper.selectById(id);
     }
+
+    @Override
+    public List<Project> listByPersonId(Long personId) {
+        return projectMapper.listByPersonId(personId);
+    }
+
 }
