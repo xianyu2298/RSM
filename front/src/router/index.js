@@ -9,11 +9,14 @@ import AwardList from '../views/award/AwardList.vue'
 import UserList from '../views/user/UserList.vue'
 import PasswordChange from '../views/user/PasswordChange.vue'
 
-
+import Login from '../views/Login.vue'
+import router from './index.js'
 
 
 const routes = [
+    { path: '/login', component: Login },
     {
+
         path: '/',
         component: Layout,
         redirect: '/project',
@@ -30,10 +33,10 @@ const routes = [
             ,
             { path: '/user', component: UserList }
             ,
-            { path: '/password', component: PasswordChange }
-
+            { path: '/password', component: PasswordChange },
 
         ]
+
     }
 
 ]
@@ -41,4 +44,17 @@ const routes = [
 export default createRouter({
     history: createWebHistory(),
     routes
+})
+
+
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('token')
+
+    // 访问登录页放行
+    if (to.path === '/login') return next()
+
+    // 未登录：跳登录
+    if (!token) return next('/login')
+
+    next()
 })

@@ -5,6 +5,9 @@
       <el-form-item label="姓名">
         <el-input v-model="query.name" placeholder="请输入姓名" />
       </el-form-item>
+      <el-form-item label="工号">
+        <el-input v-model="query.empNo" placeholder="请输入工号" />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="load">查询</el-button>
         <el-button @click="reset">重置</el-button>
@@ -85,7 +88,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const query = reactive({
   page: 1,
   size: 10,
-  name: ''
+  name: '',
+  empNo: ''
 })
 
 const list = ref([])
@@ -97,12 +101,14 @@ function load() {
   pagePerson(query).then(data => {
     list.value = data.records
     total.value = data.total
+    query.empNo = ''
   })
 
 }
 
 function reset() {
   query.name = ''
+  query.empNo = ''
   query.page = 1
   load()
 }

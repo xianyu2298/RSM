@@ -17,11 +17,15 @@ public class PersonController {
     }
 
     @GetMapping("/page")
-    public Result<PageResult<Person>> page(@RequestParam(defaultValue = "1") int page,
-                                           @RequestParam(defaultValue = "10") int size,
-                                           @RequestParam(required = false) String name) {
-        return Result.ok(personService.page(page, size, name));
+    public Result<PageResult<Person>> page(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String empNo
+    ) {
+        return Result.ok(personService.page(page, size, name, empNo));
     }
+
 
     @PostMapping
     public Result<Long> add(@RequestBody Person p) {

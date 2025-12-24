@@ -3,19 +3,39 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="edu.jjxy.researchmanagementsystem.mapper.PersonMapper">
 
-    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
-        SELECT id, emp_no, name, gender, title, department, phone, email, hire_date, remark
-        FROM research_person
+    <sql id="BaseColumns">
+        id, emp_no, name, gender, title, department, phone, email, hire_date, remark
+    </sql>
+
+    <sql id="WhereClause">
         <where>
             <if test="name != null and name != ''">
                 AND name LIKE CONCAT('%', #{name}, '%')
             </if>
+            <if test="empNo != null and empNo != ''">
+                AND emp_no LIKE CONCAT('%', #{empNo}, '%')
+            </if>
         </where>
+    </sql>
+
+    <!-- 分页查询 -->
+    <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
+        SELECT <include refid="BaseColumns"/>
+        FROM research_person
+        <include refid="WhereClause"/>
         ORDER BY id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 总数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(1)
+        FROM research_person
+        <include refid="WhereClause"/>
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
-        SELECT id, emp_no, name, gender, title, department, phone, email, hire_date, remark
+        SELECT <include refid="BaseColumns"/>
         FROM research_person
         WHERE id = #{id}
     </select>

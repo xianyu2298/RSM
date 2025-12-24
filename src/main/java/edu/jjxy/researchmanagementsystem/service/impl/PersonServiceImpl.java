@@ -8,6 +8,8 @@ import edu.jjxy.researchmanagementsystem.mapper.PersonMapper;
 import edu.jjxy.researchmanagementsystem.service.PersonService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PersonServiceImpl implements PersonService {
 
@@ -18,11 +20,13 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public PageResult<Person> page(int page, int size, String name) {
-        PageHelper.startPage(page, size);
-        PageInfo<Person> info = new PageInfo<>(personMapper.page(name));
-        return new PageResult<>(info.getTotal(), info.getList());
+    public PageResult<Person> page(int page, int size, String name, String empNo) {
+        int offset = (page - 1) * size;
+        long total = personMapper.count(name, empNo);
+        List<Person> records = personMapper.page(offset, size, name, empNo);
+        return new PageResult<>(total, records);
     }
+
 
     @Override
     public Long add(Person p) {
