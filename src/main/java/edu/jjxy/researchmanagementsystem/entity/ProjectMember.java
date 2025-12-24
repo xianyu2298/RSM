@@ -11,4 +11,7 @@ public class ProjectMember {
     private String duty;      // 职责：负责人 / 成员
     private LocalDate joinDate;
     private String remark;
+    private String empNo;
+    private String personName;
+
 }

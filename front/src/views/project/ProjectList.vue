@@ -26,6 +26,8 @@
         <template #default="{ row }">
           <el-button size="small" @click="openEdit(row)">编辑</el-button>
           <el-button size="small" type="primary" @click="openMembers(row)">成员</el-button>
+          <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
+
           <el-popconfirm title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
@@ -133,6 +135,12 @@ import { ElMessage } from 'element-plus'
 import { dictItems } from '../../api/dict'
 import { projectPage, projectAdd, projectUpdate, projectDelete } from '../../api/project'
 import { memberList, memberAdd, memberDelete } from '../../api/projectMember'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+function goDetail(id) {
+  router.push(`/project/${id}`)
+}
+
 
 const q = reactive({ name: '', natureCode: '', scopeCode: '' })
 const page = ref(1)

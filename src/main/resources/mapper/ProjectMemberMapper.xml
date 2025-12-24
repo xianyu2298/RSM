@@ -13,10 +13,20 @@
     </delete>
 
     <select id="listByProjectId" resultType="edu.jjxy.researchmanagementsystem.entity.ProjectMember">
-        SELECT id, project_id, person_id, duty, join_date, remark
-        FROM research_project_member
-        WHERE project_id = #{projectId}
-        ORDER BY id ASC
+        SELECT
+            m.id,
+            m.project_id,
+            m.person_id,
+            m.duty,
+            m.join_date,
+            m.remark,
+            p.emp_no AS empNo,
+            p.name   AS personName
+        FROM research_project_member m
+                 LEFT JOIN research_person p ON p.id = m.person_id
+        WHERE m.project_id = #{projectId}
+        ORDER BY m.id ASC
     </select>
+
 
 </mapper>
