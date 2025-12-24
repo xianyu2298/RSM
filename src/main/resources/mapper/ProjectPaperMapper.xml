@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.ProjectPaperMapper">
+
+    <insert id="insert">
+        INSERT INTO research_project_paper(project_id, paper_id)
+        VALUES (#{projectId}, #{paperId})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM research_project_paper WHERE id = #{id}
+    </delete>
+
+    <select id="listByProjectId"
+            resultType="edu.jjxy.researchmanagementsystem.entity.ProjectPaper">
+        SELECT
+            pp.id,
+            pp.project_id,
+            pp.paper_id,
+            p.title,
+            p.journal,
+            p.index_code AS indexCode,
+            p.publish_date AS publishDate,
+            p.doi
+        FROM research_project_paper pp
+                 LEFT JOIN research_paper p ON p.id = pp.paper_id
+        WHERE pp.project_id = #{projectId}
+        ORDER BY pp.id DESC
+    </select>
+
+</mapper>
+

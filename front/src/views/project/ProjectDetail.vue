@@ -74,36 +74,52 @@
         </el-tab-pane>
 
         <!-- 论文 -->
-        <el-tab-pane label="论文（按负责人展示）" name="paper">
-          <div style="color:#666;margin-bottom:10px">
-            说明：你目前论文表没有 projectId，这里按“负责人 personId”展示，答辩展示够用。
-          </div>
-          <el-table :data="papers" border>
-            <el-table-column prop="id" label="ID" width="80"/>
+        <el-tab-pane label="论文" name="paper">
+          <el-button type="success" @click="openBindPaper">绑定论文</el-button>
+
+          <el-table :data="projectPapers" border style="margin-top:10px">
+            <el-table-column prop="id" label="关联ID" width="90"/>
+            <el-table-column prop="paperId" label="论文ID" width="90"/>
             <el-table-column prop="title" label="题目"/>
-            <el-table-column prop="journal" label="期刊"/>
-            <el-table-column prop="indexCode" label="检索源" width="140">
+            <el-table-column prop="journal" label="期刊" width="180"/>
+            <el-table-column prop="indexCode" label="检索源" width="120"/>
+            <el-table-column prop="publishDate" label="发表日期" width="140"/>
+            <el-table-column prop="doi" label="DOI" width="180"/>
+            <el-table-column label="操作" width="120">
               <template #default="{ row }">
-                {{ dictName('PAPER_INDEX_SOURCE', row.indexCode) }}
+                <el-popconfirm title="解绑该论文？" @confirm="unbindPaper(row.id)">
+                  <template #reference>
+                    <el-button size="small" type="danger">解绑</el-button>
+                  </template>
+                </el-popconfirm>
               </template>
             </el-table-column>
-            <el-table-column prop="publishDate" label="发表日期" width="140"/>
           </el-table>
         </el-tab-pane>
 
-        <!-- 著作 -->
-        <el-tab-pane label="著作（按负责人展示）" name="book">
-          <div style="color:#666;margin-bottom:10px">
-            说明：你目前著作表没有 projectId，这里按“负责人 personId”展示。
-          </div>
-          <el-table :data="books" border>
-            <el-table-column prop="id" label="ID" width="80"/>
+
+        <el-tab-pane label="著作" name="book">
+          <el-button type="success" @click="openBindBook">绑定著作</el-button>
+
+          <el-table :data="projectBooks" border style="margin-top:10px">
+            <el-table-column prop="id" label="关联ID" width="90"/>
+            <el-table-column prop="bookId" label="著作ID" width="90"/>
             <el-table-column prop="name" label="书名"/>
-            <el-table-column prop="publisher" label="出版社"/>
+            <el-table-column prop="publisher" label="出版社" width="200"/>
             <el-table-column prop="publishDate" label="出版日期" width="140"/>
             <el-table-column prop="isbn" label="ISBN" width="180"/>
+            <el-table-column label="操作" width="120">
+              <template #default="{ row }">
+                <el-popconfirm title="解绑该著作？" @confirm="unbindBook(row.id)">
+                  <template #reference>
+                    <el-button size="small" type="danger">解绑</el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
+            </el-table-column>
           </el-table>
         </el-tab-pane>
+
       </el-tabs>
     </el-card>
 
@@ -186,6 +202,72 @@
         <el-button type="primary" @click="submitAddAward">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- 绑定论文弹窗 -->
+    <el-dialog v-model="paperBindDlg.visible" title="绑定论文" width="900px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <el-input v-model="paperBindDlg.keyword" placeholder="按题目关键字搜索" style="width:260px" />
+        <el-input v-model="paperBindDlg.indexCode" placeholder="检索源(可选，如 SCI)" style="width:220px" />
+        <el-button type="primary" @click="searchPaperLibrary">查询</el-button>
+      </div>
+
+      <el-table :data="paperBindDlg.list" border>
+        <el-table-column prop="id" label="论文ID" width="90"/>
+        <el-table-column prop="title" label="题目"/>
+        <el-table-column prop="journal" label="期刊" width="200"/>
+        <el-table-column prop="indexCode" label="检索源" width="120"/>
+        <el-table-column prop="publishDate" label="发表日期" width="140"/>
+        <el-table-column label="操作" width="110">
+          <template #default="{ row }">
+            <el-button size="small" type="success" @click="bindPaper(row.id)">绑定</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="margin-top:10px;display:flex;justify-content:flex-end">
+        <el-pagination
+            background
+            layout="prev, pager, next, total"
+            :total="paperBindDlg.total"
+            :page-size="paperBindDlg.size"
+            v-model:current-page="paperBindDlg.page"
+            @current-change="searchPaperLibrary"
+        />
+      </div>
+    </el-dialog>
+
+    <!-- 绑定著作弹窗 -->
+    <el-dialog v-model="bookBindDlg.visible" title="绑定著作" width="900px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <el-input v-model="bookBindDlg.keyword" placeholder="按书名关键字搜索" style="width:260px" />
+        <el-button type="primary" @click="searchBookLibrary">查询</el-button>
+      </div>
+
+      <el-table :data="bookBindDlg.list" border>
+        <el-table-column prop="id" label="著作ID" width="90"/>
+        <el-table-column prop="name" label="书名"/>
+        <el-table-column prop="publisher" label="出版社" width="220"/>
+        <el-table-column prop="publishDate" label="出版日期" width="140"/>
+        <el-table-column prop="isbn" label="ISBN" width="180"/>
+        <el-table-column label="操作" width="110">
+          <template #default="{ row }">
+            <el-button size="small" type="success" @click="bindBook(row.id)">绑定</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="margin-top:10px;display:flex;justify-content:flex-end">
+        <el-pagination
+            background
+            layout="prev, pager, next, total"
+            :total="bookBindDlg.total"
+            :page-size="bookBindDlg.size"
+            v-model:current-page="bookBindDlg.page"
+            @current-change="searchBookLibrary"
+        />
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -202,6 +284,10 @@ import { paperPage } from '../../api/paper'
 import { bookPage } from '../../api/book'
 import { pagePerson } from '../../api/person'
 
+import { projectPaperList, projectPaperBind, projectPaperUnbind } from '../../api/projectPaper'
+import { projectBookList, projectBookBind, projectBookUnbind } from '../../api/projectBook'
+
+
 const route = useRoute()
 const router = useRouter()
 const projectId = Number(route.params.id)
@@ -211,6 +297,10 @@ const members = ref([])
 const awards = ref([])
 const papers = ref([])
 const books = ref([])
+
+const projectPapers = ref([])
+const projectBooks = ref([])
+
 const active = ref('member')
 
 // 字典缓存
@@ -238,17 +328,10 @@ async function loadAll() {
   const a = await awardPage({ page: 1, size: 100, projectId })
   awards.value = a.records || []
 
-  // 论文/著作按负责人展示
-  if (project.value?.leaderPersonId) {
-    const pid = project.value.leaderPersonId
-    const p = await paperPage({ page: 1, size: 100, personId: pid })
-    papers.value = p.records || []
-    const b = await bookPage({ page: 1, size: 100, personId: pid })
-    books.value = b.records || []
-  } else {
-    papers.value = []
-    books.value = []
-  }
+  // ✅ 项目绑定的论文 / 著作（B2）
+  projectPapers.value = await projectPaperList(projectId)
+  projectBooks.value = await projectBookList(projectId)
+
 }
 
 function back() {
@@ -332,6 +415,96 @@ async function delAward(id) {
   const a = await awardPage({ page: 1, size: 100, projectId })
   awards.value = a.records || []
 }
+// ===================== 论文 / 著作：绑定弹窗状态 =====================
+
+// 论文绑定弹窗
+const paperBindDlg = reactive({
+  visible: false,
+  keyword: '',
+  indexCode: '',
+  page: 1,
+  size: 8,
+  total: 0,
+  list: []
+})
+
+// 著作绑定弹窗
+const bookBindDlg = reactive({
+  visible: false,
+  keyword: '',
+  page: 1,
+  size: 8,
+  total: 0,
+  list: []
+})
+
+/** 打开绑定论文弹窗 */
+async function openBindPaper() {
+  paperBindDlg.visible = true
+  paperBindDlg.page = 1
+  await searchPaperLibrary()
+}
+
+/** 查询论文库（用你现有 paperPage） */
+async function searchPaperLibrary() {
+  const res = await paperPage({
+    page: paperBindDlg.page,
+    size: paperBindDlg.size,
+    title: paperBindDlg.keyword || undefined,
+    indexCode: paperBindDlg.indexCode || undefined
+  })
+  paperBindDlg.list = res.records || []
+  paperBindDlg.total = res.total || 0
+}
+
+/** 绑定论文到项目 */
+async function bindPaper(paperId) {
+  await projectPaperBind(projectId, paperId)
+  ElMessage.success('绑定论文成功')
+  // 刷新本项目绑定论文列表
+  projectPapers.value = await projectPaperList(projectId)
+}
+
+/** 解绑论文（传中间表 id） */
+async function unbindPaper(id) {
+  await projectPaperUnbind(id)
+  ElMessage.success('解绑成功')
+  projectPapers.value = await projectPaperList(projectId)
+}
+
+
+/** 打开绑定著作弹窗 */
+async function openBindBook() {
+  bookBindDlg.visible = true
+  bookBindDlg.page = 1
+  await searchBookLibrary()
+}
+
+/** 查询著作库（用你现有 bookPage） */
+async function searchBookLibrary() {
+  const res = await bookPage({
+    page: bookBindDlg.page,
+    size: bookBindDlg.size,
+    name: bookBindDlg.keyword || undefined
+  })
+  bookBindDlg.list = res.records || []
+  bookBindDlg.total = res.total || 0
+}
+
+/** 绑定著作到项目 */
+async function bindBook(bookId) {
+  await projectBookBind(projectId, bookId)
+  ElMessage.success('绑定著作成功')
+  projectBooks.value = await projectBookList(projectId)
+}
+
+/** 解绑著作（传中间表 id） */
+async function unbindBook(id) {
+  await projectBookUnbind(id)
+  ElMessage.success('解绑成功')
+  projectBooks.value = await projectBookList(projectId)
+}
+
 
 onMounted(async () => {
   await loadDict()

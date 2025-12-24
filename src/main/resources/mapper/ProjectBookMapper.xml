@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.jjxy.researchmanagementsystem.mapper.ProjectBookMapper">
+
+    <insert id="insert">
+        INSERT INTO research_project_book(project_id, book_id)
+        VALUES (#{projectId}, #{bookId})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM research_project_book WHERE id = #{id}
+    </delete>
+
+    <select id="listByProjectId" resultType="edu.jjxy.researchmanagementsystem.entity.ProjectBook">
+        SELECT
+            pb.id,
+            pb.project_id,
+            pb.book_id,
+            b.name         AS bookName,
+            b.publisher    AS publisher,
+            b.publish_date AS publishDate,
+            b.isbn         AS isbn
+        FROM research_project_book pb
+                 LEFT JOIN research_book b ON b.id = pb.book_id
+        WHERE pb.project_id = #{projectId}
+        ORDER BY pb.id DESC
+    </select>
+
+</mapper>
