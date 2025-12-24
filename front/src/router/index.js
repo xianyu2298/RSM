@@ -30,7 +30,9 @@ const routes = [
             { path: '/award', component: AwardList },
             { path: '/user', component: UserList },
             { path: '/password', component: PasswordChange },
-            { path: '/person/:id', component: () => import('../views/person/PersonDetail.vue') }
+            { path: '/person/:id', component: () => import('../views/person/PersonDetail.vue') },
+            { path: '/dict', component: () => import('../views/dict/DictManage.vue') }
+
 
         ]
     }

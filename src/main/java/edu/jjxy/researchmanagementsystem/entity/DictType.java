@@ -2,14 +2,13 @@ package edu.jjxy.researchmanagementsystem.entity;
 
 import java.util.Date;
 
-public class DictItem {
+public class DictType {
     private Long id;
     private String typeCode;
-    private String itemCode;
-    private String itemName;
+    private String typeName;
+    private String remark;
     private Integer status;   // 1启用 0停用
     private Integer sortNo;
-    private String remark;
     private Date createdAt;
     private Date updatedAt;
 
@@ -19,20 +18,17 @@ public class DictItem {
     public String getTypeCode() { return typeCode; }
     public void setTypeCode(String typeCode) { this.typeCode = typeCode; }
 
-    public String getItemCode() { return itemCode; }
-    public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+    public String getTypeName() { return typeName; }
+    public void setTypeName(String typeName) { this.typeName = typeName; }
 
-    public String getItemName() { return itemName; }
-    public void setItemName(String itemName) { this.itemName = itemName; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
 
     public Integer getStatus() { return status; }
     public void setStatus(Integer status) { this.status = status; }
 
     public Integer getSortNo() { return sortNo; }
     public void setSortNo(Integer sortNo) { this.sortNo = sortNo; }
-
-    public String getRemark() { return remark; }
-    public void setRemark(String remark) { this.remark = remark; }
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }

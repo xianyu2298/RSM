@@ -9,6 +9,7 @@
         <el-menu-item index="/book">著作管理</el-menu-item>
         <el-menu-item index="/award">获奖管理</el-menu-item>
         <el-menu-item index="/user">用户管理</el-menu-item>
+        <el-menu-item index="/dict">字典管理</el-menu-item>
         <el-menu-item index="/password">修改密码</el-menu-item>
       </el-menu>
     </el-aside>
