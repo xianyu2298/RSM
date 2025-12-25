@@ -81,9 +81,10 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { awardPage, awardAdd, awardUpdate, awardDelete } from '../../api/award'
+import { getCurrentUser, isAdminUser } from '../../utils/http'
 
-const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = currentUser && currentUser.role === 'ADMIN'
+const currentUser = getCurrentUser()
+const isAdmin = isAdminUser(currentUser)
 
 const q = reactive({ projectId: '', awardName: '' })
 const page = ref(1)

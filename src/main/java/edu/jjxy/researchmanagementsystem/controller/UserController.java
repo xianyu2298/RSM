@@ -30,6 +30,12 @@ public class UserController {
         return Result.ok(service.add(u));
     }
 
+    @PutMapping
+    public Result<Void> update(@RequestBody User u) {
+        service.update(u);
+        return Result.ok(null);
+    }
+
     @PutMapping("/status")
     public Result<Void> status(@RequestParam Long id, @RequestParam Integer status) {
         service.enable(id, status);

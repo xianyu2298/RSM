@@ -40,10 +40,11 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { getCurrentUser, isAdminUser } from '../utils/http'
 
 const router = useRouter()
-const user = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = user && user.role === 'ADMIN'
+const user = getCurrentUser()
+const isAdmin = isAdminUser(user)
 
 function logout() {
   localStorage.removeItem('token')

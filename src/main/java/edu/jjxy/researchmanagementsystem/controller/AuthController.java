@@ -18,6 +18,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result<LoginResp> login(@RequestBody LoginReq req) {
-        return Result.ok(authService.login(req));
+        try {
+            return Result.ok(authService.login(req));
+        } catch (RuntimeException e) {
+            return Result.fail(e.getMessage());
+        }
     }
 }

@@ -9,9 +9,8 @@ import UserList from '../views/user/UserList.vue'
 import PasswordChange from '../views/user/PasswordChange.vue'
 import Login from '../views/Login.vue'
 import PersonDetail from '../views/person/PersonDetail.vue'
-
-// ✅ 新增：项目详情页
 import ProjectDetail from '../views/project/ProjectDetail.vue'
+import { getCurrentUser, isAdminUser } from '../utils/http'
 
 const routes = [
     { path: '/login', component: Login },
@@ -51,18 +50,10 @@ router.beforeEach((to, from, next) => {
     if (!token) {
         return next('/login')
     }
-    const userStr = localStorage.getItem('user')
-    let role = null
-    if (userStr) {
-        try {
-            const u = JSON.parse(userStr)
-            role = u && u.role
-        } catch (e) {
-            role = null
-        }
-    }
+    const user = getCurrentUser()
+    const isAdmin = isAdminUser(user)
     if (to.path.startsWith('/user') || to.path.startsWith('/dict')) {
-        if (role !== 'ADMIN') {
+        if (!isAdmin) {
             return next('/project')
         }
     }

@@ -44,9 +44,10 @@
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { changePassword, resetPassword } from '../../api/user'
+import { getCurrentUser, isAdminUser } from '../../utils/http'
 
-const user = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = user && user.role === 'ADMIN'
+const user = getCurrentUser()
+const isAdmin = isAdminUser(user)
 
 const form = reactive({
   userId: user && user.id ? user.id : null,

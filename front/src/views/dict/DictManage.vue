@@ -206,9 +206,10 @@ import {
   dictTypePage, dictTypeList, dictTypeAdd, dictTypeUpdate, dictTypeDelete,
   dictItemPage, dictItemAdd, dictItemUpdate, dictItemDelete
 } from '../../api/dict'
+import { getCurrentUser, isAdminUser } from '../../utils/http'
 
-const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = currentUser && currentUser.role === 'ADMIN'
+const currentUser = getCurrentUser()
+const isAdmin = isAdminUser(currentUser)
 
 const active = ref('type')
 

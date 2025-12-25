@@ -143,12 +143,13 @@ import { dictItems } from '../../api/dict'
 import { projectPage, projectAdd, projectUpdate, projectDelete } from '../../api/project'
 import { memberList, memberAdd, memberDelete } from '../../api/projectMember'
 import { useRouter } from 'vue-router'
+import { getCurrentUser, isAdminUser } from '../../utils/http'
 const router = useRouter()
 function goDetail(id) {
   router.push(`/project/${id}`)
 }
-const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = currentUser && currentUser.role === 'ADMIN'
+const currentUser = getCurrentUser()
+const isAdmin = isAdminUser(currentUser)
 const q = reactive({ name: '', natureCode: '', scopeCode: '' })
 const page = ref(1)
 const size = ref(10)

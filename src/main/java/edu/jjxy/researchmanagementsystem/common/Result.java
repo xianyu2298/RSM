@@ -13,4 +13,20 @@ public class Result<T> {
         r.code = 0; r.msg = "ok"; r.data = data;
         return r;
     }
+
+    public static <T> Result<T> fail(String msg) {
+        Result<T> r = new Result<>();
+        r.code = 1;
+        r.msg = msg;
+        r.data = null;
+        return r;
+    }
+
+    public static <T> Result<T> fail(int code, String msg) {
+        Result<T> r = new Result<>();
+        r.code = code;
+        r.msg = msg;
+        r.data = null;
+        return r;
+    }
 }

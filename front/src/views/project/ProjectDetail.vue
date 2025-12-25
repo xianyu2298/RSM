@@ -300,9 +300,10 @@ import { pagePerson } from '../../api/person'
 
 import { projectPaperList, projectPaperBind, projectPaperUnbind } from '../../api/projectPaper'
 import { projectBookList, projectBookBind, projectBookUnbind } from '../../api/projectBook'
+import { getCurrentUser, isAdminUser } from '../../utils/http'
 
-const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-const isAdmin = currentUser && currentUser.role === 'ADMIN'
+const currentUser = getCurrentUser()
+const isAdmin = isAdminUser(currentUser)
 
 const route = useRoute()
 const router = useRouter()

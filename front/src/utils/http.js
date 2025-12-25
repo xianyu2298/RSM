@@ -41,4 +41,16 @@ http.interceptors.response.use(
     }
 )
 
+export function getCurrentUser() {
+    try {
+        return JSON.parse(localStorage.getItem('user') || '{}')
+    } catch (e) {
+        return {}
+    }
+}
+
+export function isAdminUser(user) {
+    return !!(user && user.role === 'ADMIN')
+}
+
 export default http

@@ -30,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User db = userMapper.selectByUsername(req.getUsername());
-        if (db == null) throw new RuntimeException("用户名不存在");
+        if (db == null) throw new RuntimeException("用户名错误");
 
         if (db.getStatus() != null && db.getStatus() == 0) {
             throw new RuntimeException("账号已被禁用");
