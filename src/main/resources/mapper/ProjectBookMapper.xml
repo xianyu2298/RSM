@@ -24,7 +24,7 @@
         FROM research_project_book pb
                  LEFT JOIN research_book b ON b.id = pb.book_id
         WHERE pb.project_id = #{projectId}
-        ORDER BY pb.id DESC
+        ORDER BY pb.id ASC
     </select>
 
 </mapper>

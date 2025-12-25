@@ -28,7 +28,7 @@
             </if>
         </where>
         GROUP BY a.id
-        ORDER BY a.id DESC
+        ORDER BY a.id ASC
     </select>
 
 
@@ -74,7 +74,7 @@
                  LEFT JOIN research_person rp2 ON rp2.id = pm2.person_id
         WHERE rp.id = #{personId}
         GROUP BY a.id
-        ORDER BY a.id DESC
+        ORDER BY a.id ASC
     </select>
 
 

@@ -18,7 +18,7 @@
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
-      <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column prop="id" label="用户ID" width="90" />
       <el-table-column prop="username" label="用户名" width="160" />
       <el-table-column prop="realName" label="姓名" width="160" />
       <el-table-column prop="role" label="角色" width="120" />

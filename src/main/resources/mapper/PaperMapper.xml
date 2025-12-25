@@ -28,7 +28,7 @@
                 AND p.index_code = #{indexCode}
             </if>
         </where>
-        ORDER BY p.id DESC
+        ORDER BY p.id ASC
     </select>
 
 

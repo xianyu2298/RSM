@@ -25,7 +25,7 @@
                 AND status = #{status}
             </if>
         </where>
-        ORDER BY sort_no ASC, id DESC
+        ORDER BY sort_no ASC, id ASC
     </select>
 
     <select id="listAll" resultType="edu.jjxy.researchmanagementsystem.entity.DictType">
@@ -39,7 +39,7 @@
             created_at AS createdAt,
             updated_at AS updatedAt
         FROM sys_dict_type
-        ORDER BY sort_no ASC, id DESC
+        ORDER BY sort_no ASC, id ASC
     </select>
 
     <select id="getById" resultType="edu.jjxy.researchmanagementsystem.entity.DictType">
@@ -54,6 +54,10 @@
             updated_at AS updatedAt
         FROM sys_dict_type
         WHERE id = #{id}
+    </select>
+
+    <select id="maxSortNo" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(sort_no), 0) FROM sys_dict_type
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">

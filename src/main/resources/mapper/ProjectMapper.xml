@@ -18,6 +18,7 @@
                 AND scope_code = #{scopeCode}
             </if>
         </where>
+        ORDER BY id ASC
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Project">
@@ -58,7 +59,7 @@
         FROM research_project p
                  LEFT JOIN research_project_member pm ON pm.project_id = p.id
         WHERE pm.person_id = #{personId}
-        ORDER BY p.id DESC
+        ORDER BY p.id ASC
     </select>
 
 </mapper>

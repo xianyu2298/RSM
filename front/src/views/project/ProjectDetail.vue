@@ -4,7 +4,6 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 style="margin:0">项目详情</h2>
-          <div style="color:#888;margin-top:6px">项目ID：{{ projectId }}</div>
         </div>
         <el-button @click="back">返回</el-button>
       </div>
@@ -30,7 +29,6 @@
 
         <el-descriptions-item label="项目性质">{{ dictName('PROJECT_NATURE', project.natureCode) }}</el-descriptions-item>
         <el-descriptions-item label="项目范围">{{ dictName('PROJECT_SCOPE', project.scopeCode) }}</el-descriptions-item>
-        <el-descriptions-item label="负责人ID">{{ project.leaderPersonId || '-' }}</el-descriptions-item>
 
         <el-descriptions-item label="开始日期">{{ project.startDate }}</el-descriptions-item>
         <el-descriptions-item label="结束日期">{{ project.endDate }}</el-descriptions-item>
@@ -46,8 +44,6 @@
         <el-tab-pane label="成员" name="member">
           <el-button v-if="isAdmin" type="success" @click="openAddMember">新增成员</el-button>
           <el-table :data="members" border style="margin-top:10px">
-            <el-table-column prop="id" label="ID" width="80"/>
-            <el-table-column prop="personId" label="人员ID" width="100"/>
             <el-table-column prop="empNo" label="工号" width="120" />
             <el-table-column prop="personName" label="姓名" width="120" />
             <el-table-column prop="duty" label="职责" width="140"/>

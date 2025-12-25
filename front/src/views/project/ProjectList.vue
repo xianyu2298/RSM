@@ -15,7 +15,6 @@
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
-      <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="projectCode" label="项目编号" width="140" />
       <el-table-column prop="name" label="项目名称" min-width="240" />
       <el-table-column prop="natureCode" label="性质" width="120">
@@ -106,7 +105,6 @@
   <!-- 成员维护 -->
   <el-dialog v-model="memDlg.visible" :title="memDlg.title" width="820px">
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <el-input-number v-model="memForm.personId" :min="1" />
       <el-input v-model="memForm.duty" placeholder="职责" style="width:200px" />
       <el-date-picker v-model="memForm.joinDate" type="date" value-format="YYYY-MM-DD" placeholder="加入日期" />
       <el-input v-model="memForm.remark" placeholder="备注" style="width:200px" />
@@ -114,8 +112,6 @@
     </div>
 
     <el-table :data="members" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="personId" label="人员ID" width="100" />
       <el-table-column prop="duty" label="职责" width="160" />
       <el-table-column prop="joinDate" label="加入日期" width="140" />
       <el-table-column prop="remark" label="备注" />

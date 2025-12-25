@@ -2,15 +2,12 @@
   <el-card>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <el-input v-model="q.name" placeholder="著作名称" style="width:240px" />
-      <el-input v-model="q.personId" placeholder="作者人员ID" style="width:140px" />
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
       <el-button v-if="isAdmin" type="success" @click="openAdd">新增著作</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="personId" label="人员ID" width="90" />
       <el-table-column label="作者" width="160">
         <template #default="{ row }">
           {{ row.empNo }} - {{ row.personName }}
@@ -21,6 +18,7 @@
       <el-table-column prop="publisher" label="出版社" width="180" />
       <el-table-column prop="publishDate" label="出版日期" width="120" />
       <el-table-column prop="isbn" label="ISBN" width="170" />
+      <el-table-column prop="remark" label="备注" min-width="200" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
@@ -47,8 +45,24 @@
 
   <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
-      <el-form-item label="人员ID">
-        <el-input-number v-model="form.personId" :min="1" />
+      <el-form-item label="作者">
+        <el-select
+            v-model="form.personId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="输入姓名或工号搜索作者"
+            :remote-method="remoteSearchPerson"
+            :loading="personLoading"
+            style="width:100%"
+        >
+          <el-option
+              v-for="p in personOptions"
+              :key="p.id"
+              :label="`${p.empNo} - ${p.name}`"
+              :value="p.id"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="著作名称">
@@ -83,21 +97,25 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { bookPage, bookAdd, bookUpdate, bookDelete } from '../../api/book'
+import { pagePerson } from '../../api/person'
 import { getCurrentUser, isAdminUser } from '../../utils/http'
 
 const currentUser = getCurrentUser()
 const isAdmin = isAdminUser(currentUser)
 
-const q = reactive({ name: '', personId: '' })
+const q = reactive({ name: '' })
 const page = ref(1)
 const size = ref(10)
 const total = ref(0)
 const rows = ref([])
 
+const personOptions = ref([])
+const personLoading = ref(false)
+
 const dlg = reactive({ visible: false, title: '' })
 const form = reactive({
   id: null,
-  personId: 1,
+  personId: null,
   name: '',
   publisher: '',
   publishDate: '',
@@ -109,8 +127,7 @@ async function load() {
   const data = await bookPage({
     page: page.value,
     size: size.value,
-    name: q.name || undefined,
-    personId: q.personId || undefined
+    name: q.name || undefined
   })
   total.value = data.total
   rows.value = data.records
@@ -118,7 +135,6 @@ async function load() {
 
 function reset() {
   q.name = ''
-  q.personId = ''
   page.value = 1
   load()
 }
@@ -126,9 +142,10 @@ function reset() {
 function openAdd() {
   dlg.title = '新增著作'
   dlg.visible = true
+  personOptions.value = []
   Object.assign(form, {
     id: null,
-    personId: 1,
+    personId: null,
     name: '',
     publisher: '',
     publishDate: '',
@@ -141,10 +158,17 @@ function openEdit(row) {
   dlg.title = '编辑著作'
   dlg.visible = true
   Object.assign(form, row)
+  personOptions.value = row.personId
+    ? [{
+      id: row.personId,
+      empNo: row.empNo,
+      name: row.personName
+    }]
+    : []
 }
 
 async function save() {
-  if (!form.personId) return ElMessage.warning('人员ID必填')
+  if (!form.personId) return ElMessage.warning('请选择作者')
   if (!form.name) return ElMessage.warning('著作名称必填')
 
   if (form.id) await bookUpdate(form)
@@ -159,6 +183,24 @@ async function remove(id) {
   await bookDelete(id)
   ElMessage.success('删除成功')
   load()
+}
+
+async function remoteSearchPerson(keyword) {
+  if (!keyword || keyword.trim() === '') {
+    personOptions.value = []
+    return
+  }
+  personLoading.value = true
+  try {
+    const r1 = await pagePerson({ page: 1, size: 10, name: keyword })
+    const r2 = await pagePerson({ page: 1, size: 10, empNo: keyword })
+    const map = new Map()
+    ;(r1.records || []).forEach(p => map.set(p.id, p))
+    ;(r2.records || []).forEach(p => map.set(p.id, p))
+    personOptions.value = Array.from(map.values())
+  } finally {
+    personLoading.value = false
+  }
 }
 
 onMounted(load)

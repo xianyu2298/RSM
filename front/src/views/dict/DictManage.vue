@@ -35,7 +35,6 @@
           </el-form>
 
           <el-table :data="typeList" border>
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="typeCode" label="类型编码" width="180"/>
             <el-table-column prop="typeName" label="类型名称" />
             <el-table-column prop="sortNo" label="排序" width="90"/>
@@ -100,7 +99,6 @@
           </el-form>
 
           <el-table :data="itemList" border>
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="typeCode" label="类型编码" width="180"/>
             <el-table-column prop="itemCode" label="项编码" width="160"/>
             <el-table-column prop="itemName" label="项名称"/>
@@ -147,7 +145,7 @@
         <el-form-item label="类型名称">
           <el-input v-model="typeDlg.form.typeName" />
         </el-form-item>
-        <el-form-item label="排序">
+        <el-form-item v-if="typeDlg.form.id" label="排序">
           <el-input v-model="typeDlg.form.sortNo" />
         </el-form-item>
         <el-form-item label="状态">
@@ -178,7 +176,7 @@
         <el-form-item label="项名称">
           <el-input v-model="itemDlg.form.itemName" />
         </el-form-item>
-        <el-form-item label="排序">
+        <el-form-item v-if="itemDlg.form.id" label="排序">
           <el-input v-model="itemDlg.form.sortNo" />
         </el-form-item>
         <el-form-item label="状态">

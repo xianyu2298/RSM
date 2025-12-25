@@ -35,7 +35,11 @@ public class DictItemServiceImpl implements DictItemService {
     @Override
     public void add(DictItem t) {
         if (t.getStatus() == null) t.setStatus(1);
-        if (t.getSortNo() == null) t.setSortNo(0);
+        if (t.getSortNo() == null) {
+            Integer max = mapper.maxSortNoByTypeCode(t.getTypeCode());
+            int next = (max == null ? 0 : max) + 1;
+            t.setSortNo(next);
+        }
         mapper.insert(t);
     }
 

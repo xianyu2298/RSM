@@ -29,7 +29,7 @@
                 AND status = #{status}
             </if>
         </where>
-        ORDER BY sort_no ASC, id DESC
+        ORDER BY sort_no ASC, id ASC
     </select>
 
     <!-- 业务页面读取：仅启用项 -->
@@ -48,6 +48,12 @@
         WHERE type_code = #{typeCode}
           AND status = 1
         ORDER BY sort_no ASC, id ASC
+    </select>
+
+    <select id="maxSortNoByTypeCode" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(sort_no), 0)
+        FROM sys_dict_item
+        WHERE type_code = #{typeCode}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">

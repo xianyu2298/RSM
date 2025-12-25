@@ -17,7 +17,6 @@
 
     <!-- 表格 -->
     <el-table :data="list" border style="width: 100%">
-      <el-table-column prop="id" label="ID" width="60" />
       <el-table-column prop="empNo" label="工号" />
       <el-table-column prop="name" label="姓名" />
       <el-table-column prop="gender" label="性别" width="80" />

@@ -24,7 +24,7 @@
                 AND b.person_id = #{personId}
             </if>
         </where>
-        ORDER BY b.id DESC
+        ORDER BY b.id ASC
     </select>
 
 

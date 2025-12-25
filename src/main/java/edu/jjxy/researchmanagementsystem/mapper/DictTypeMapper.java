@@ -14,6 +14,8 @@ public interface DictTypeMapper {
 
     DictType getById(@Param("id") Long id);
 
+    Integer maxSortNo();
+
     int insert(DictType t);
     int update(DictType t);
     int deleteById(@Param("id") Long id);

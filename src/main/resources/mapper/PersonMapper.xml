@@ -23,7 +23,7 @@
         SELECT <include refid="BaseColumns"/>
         FROM research_person
         <include refid="WhereClause"/>
-        ORDER BY id DESC
+        ORDER BY id ASC
         LIMIT #{offset}, #{size}
     </select>
 

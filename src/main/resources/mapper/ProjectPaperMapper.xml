@@ -26,7 +26,7 @@
         FROM research_project_paper pp
                  LEFT JOIN research_paper p ON p.id = pp.paper_id
         WHERE pp.project_id = #{projectId}
-        ORDER BY pp.id DESC
+        ORDER BY pp.id ASC
     </select>
 
 </mapper>

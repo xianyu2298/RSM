@@ -29,7 +29,6 @@
         <!-- 参与项目 -->
         <el-tab-pane label="参与项目" name="project">
           <el-table :data="projects" border style="margin-top:10px">
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="projectCode" label="项目编号" width="140"/>
             <el-table-column prop="name" label="项目名称"/>
             <el-table-column prop="startDate" label="开始日期" width="140"/>
@@ -50,7 +49,6 @@
         <!-- 论文 -->
         <el-tab-pane label="论文" name="paper">
           <el-table :data="papers" border style="margin-top:10px">
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="title" label="题目"/>
             <el-table-column prop="journal" label="期刊" width="220"/>
             <el-table-column prop="indexCode" label="检索源" width="140">
@@ -66,7 +64,6 @@
         <!-- 著作 -->
         <el-tab-pane label="著作" name="book">
           <el-table :data="books" border style="margin-top:10px">
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="name" label="书名"/>
             <el-table-column prop="publisher" label="出版社" width="220"/>
             <el-table-column prop="publishDate" label="出版日期" width="140"/>
@@ -77,7 +74,6 @@
         <!-- 参与项目获奖 -->
         <el-tab-pane label="获奖（参与项目）" name="award">
           <el-table :data="awards" border style="margin-top:10px">
-            <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="awardName" label="奖项名称"/>
             <el-table-column prop="awardPersons" label="获奖人（项目成员）" width="260" />
             <el-table-column prop="awardLevel" label="级别" width="140"/>

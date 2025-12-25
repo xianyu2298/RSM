@@ -1,7 +1,6 @@
 <template>
   <el-card>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <el-input v-model="q.projectId" placeholder="项目ID" style="width:140px" />
       <el-input v-model="q.awardName" placeholder="奖项名称" style="width:240px" />
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
@@ -9,8 +8,6 @@
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="projectId" label="项目ID" width="90" />
       <el-table-column prop="projectCode" label="项目编号" width="140" />
       <el-table-column prop="projectName" label="项目名称" />
       <el-table-column prop="awardName" label="奖项名称" min-width="220" />
@@ -45,8 +42,15 @@
 
   <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
-      <el-form-item label="项目ID">
-        <el-input-number v-model="form.projectId" :min="1" />
+      <el-form-item label="所属项目">
+        <el-select v-model="form.projectId" filterable placeholder="请选择项目" style="width:100%">
+          <el-option
+              v-for="p in projectOptions"
+              :key="p.id"
+              :label="`${p.id} - ${p.name}`"
+              :value="p.id"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="奖项名称">
@@ -81,18 +85,20 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { awardPage, awardAdd, awardUpdate, awardDelete } from '../../api/award'
+import { projectPage } from '../../api/project'
 import { getCurrentUser, isAdminUser } from '../../utils/http'
 
 const currentUser = getCurrentUser()
 const isAdmin = isAdminUser(currentUser)
 
-const q = reactive({ projectId: '', awardName: '' })
+const q = reactive({ awardName: '' })
 const page = ref(1)
 const size = ref(10)
 const total = ref(0)
 const rows = ref([])
 
 const dlg = reactive({ visible: false, title: '' })
+const projectOptions = ref([])
 const form = reactive({
   id: null,
   projectId: 1,
@@ -107,7 +113,6 @@ async function load() {
   const data = await awardPage({
     page: page.value,
     size: size.value,
-    projectId: q.projectId || undefined,
     awardName: q.awardName || undefined
   })
   total.value = data.total
@@ -115,7 +120,6 @@ async function load() {
 }
 
 function reset() {
-  q.projectId = ''
   q.awardName = ''
   page.value = 1
   load()
@@ -142,7 +146,7 @@ function openEdit(row) {
 }
 
 async function save() {
-  if (!form.projectId) return ElMessage.warning('项目ID必填')
+  if (!form.projectId) return ElMessage.warning('请选择所属项目')
   if (!form.awardName) return ElMessage.warning('奖项名称必填')
 
   if (form.id) await awardUpdate(form)
@@ -159,5 +163,13 @@ async function remove(id) {
   load()
 }
 
-onMounted(load)
+async function loadProjectOptions() {
+  const res = await projectPage({ page: 1, size: 1000 })
+  projectOptions.value = res.records || []
+}
+
+onMounted(async () => {
+  await load()
+  await loadProjectOptions()
+})
 </script>

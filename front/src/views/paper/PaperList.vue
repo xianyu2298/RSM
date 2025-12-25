@@ -2,7 +2,6 @@
   <el-card>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <el-input v-model="q.title" placeholder="论文标题" style="width:220px" />
-      <el-input v-model="q.personId" placeholder="作者人员ID" style="width:140px" />
       <el-select v-model="q.indexCode" placeholder="检索源" style="width:180px" clearable>
         <el-option v-for="i in indexItems" :key="i.itemCode" :label="i.itemName" :value="i.itemCode" />
       </el-select>
@@ -13,10 +12,6 @@
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="personId" label="人员ID" width="90" />
-
-
       <el-table-column label="作者" width="160">
         <template #default="{ row }">
           {{ row.empNo }} - {{ row.personName }}
@@ -55,8 +50,8 @@
   <!-- 新增/编辑 -->
   <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
-      <el-form-item label="人员ID">
-        <el-input-number v-model="form.personId" :min="1" />
+      <el-form-item label="作者人员ID">
+        <el-input v-model="form.personId" />
       </el-form-item>
 
       <el-form-item label="论文标题">
@@ -103,7 +98,7 @@ import { getCurrentUser, isAdminUser } from '../../utils/http'
 const currentUser = getCurrentUser()
 const isAdmin = isAdminUser(currentUser)
 
-const q = reactive({ title: '', personId: '', indexCode: '' })
+const q = reactive({ title: '', indexCode: '' })
 const page = ref(1)
 const size = ref(10)
 const total = ref(0)
@@ -133,7 +128,6 @@ async function load() {
     page: page.value,
     size: size.value,
     title: q.title || undefined,
-    personId: q.personId || undefined,
     indexCode: q.indexCode || undefined
   })
   total.value = data.total
@@ -142,7 +136,6 @@ async function load() {
 
 function reset() {
   q.title = ''
-  q.personId = ''
   q.indexCode = ''
   page.value = 1
   load()
@@ -153,7 +146,7 @@ function openAdd() {
   dlg.visible = true
   Object.assign(form, {
     id: null,
-    personId: 1,
+    personId: '',
     title: '',
     journal: '',
     indexCode: '',

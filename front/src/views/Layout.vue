@@ -10,7 +10,7 @@
         <el-menu-item index="/award">获奖管理</el-menu-item>
         <el-menu-item v-if="isAdmin" index="/user">用户管理</el-menu-item>
         <el-menu-item v-if="isAdmin" index="/dict">字典管理</el-menu-item>
-        <el-menu-item index="/password">修改密码</el-menu-item>
+        <el-menu-item v-if="!isAdmin" index="/password">修改密码</el-menu-item>
       </el-menu>
     </el-aside>
 

@@ -38,7 +38,11 @@ public class DictTypeServiceImpl implements DictTypeService {
     @Override
     public void add(DictType t) {
         if (t.getStatus() == null) t.setStatus(1);
-        if (t.getSortNo() == null) t.setSortNo(0);
+        if (t.getSortNo() == null) {
+            Integer max = typeMapper.maxSortNo();
+            int next = (max == null ? 0 : max) + 1;
+            t.setSortNo(next);
+        }
         typeMapper.insert(t);
     }
 
