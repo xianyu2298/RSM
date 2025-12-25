@@ -79,7 +79,7 @@
       </el-form-item>
 
       <el-form-item v-if="!form.id" label="初始密码">
-        <el-input v-model="form.initPwd" placeholder="不填则默认 123456（按你后端逻辑）" show-password />
+        <el-input v-model="form.initPwd" placeholder="不填则默认 123456" show-password />
       </el-form-item>
     </el-form>
 
@@ -89,7 +89,7 @@
     </template>
   </el-dialog>
 
-  <!-- 重置密码（这里如果你后端没提供 reset 接口，就用“改密码接口”强制重置） -->
+  <!-- 重置密码 -->
   <el-dialog v-model="pwdDlg.visible" title="重置密码" width="480px">
     <div style="margin-bottom:8px">用户：{{ pwdDlg.username }}</div>
     <el-input v-model="pwdDlg.newPwd" placeholder="新密码" show-password />
@@ -203,8 +203,7 @@ async function remove(id) {
   load()
 }
 
-// 如果你后端没提供专门 reset-password 接口，我们就用 changePassword 来“强制重置”
-// 但 changePassword 需要 oldPwd，所以这里默认 oldPwd=123456（你系统初始密码就是这个）
+
 function openResetPwd(row) {
   pwdDlg.visible = true
   pwdDlg.userId = row.id

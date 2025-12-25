@@ -34,9 +34,7 @@
       <el-button type="primary" @click="submit">提交</el-button>
     </div>
 
-    <div style="margin-top:10px;color:#888;font-size:12px">
-      提示：这里的旧密码/新密码都填“明文”，后端会做加密对比与保存。
-    </div>
+
   </el-card>
 </template>
 

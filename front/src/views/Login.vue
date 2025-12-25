@@ -17,9 +17,6 @@
           <el-button type="primary" @click="submit">登录</el-button>
         </div>
 
-        <div style="margin-top:10px;color:#888;font-size:12px">
-          暂未接入 Security，先用普通接口登录。
-        </div>
       </el-form>
     </el-card>
   </div>
@@ -47,7 +44,7 @@ async function submit() {
   if (!form.username) return ElMessage.warning('请输入用户名')
   if (!form.password) return ElMessage.warning('请输入密码')
 
-  // ✅ 调用后端登录
+  // 调用后端登录
   const user = await login({ username: form.username, password: form.password })
 
   // 保存登录态

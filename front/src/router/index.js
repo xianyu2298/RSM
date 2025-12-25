@@ -20,7 +20,7 @@ const routes = [
         redirect: '/project',
         children: [
             { path: '/project', component: ProjectList },
-            // ✅ 新增：/project/10 这种
+
             { path: '/project/:id', component: ProjectDetail },
 
             { path: '/person', component: PersonList },

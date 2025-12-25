@@ -12,7 +12,6 @@ export const updatePerson = (data) => http.put('/api/person', data)
 // 删除
 export const deletePerson = (id) => http.delete(`/api/person/${id}`)
 
-// 根据ID获取（可选）
-export const getPerson = (id) => http.get(`/api/person/${id}`)
+// 根据ID获取
 export const personGet = (id) => http.get(`/api/person/${id}`)
 

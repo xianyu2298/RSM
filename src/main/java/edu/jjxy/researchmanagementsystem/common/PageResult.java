@@ -8,13 +8,13 @@ public class PageResult<T> {
 
     public PageResult() {}
 
-    // ✅ 你项目当前正确顺序：records 在前，total 在后
+    //  你项目当前正确顺序：records 在前，total 在后
     public PageResult(List<T> records, long total) {
         this.records = records;
         this.total = total;
     }
 
-    // ✅ 新增：兼容旧/写反的用法：total 在前，records 在后
+    //  新增：兼容旧/写反的用法：total 在前，records 在后
     public PageResult(long total, List<T> records) {
         this.records = records;
         this.total = total;
