@@ -14,7 +14,7 @@
 
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
-      <el-button type="success" @click="openAdd">新增用户</el-button>
+      <el-button v-if="isAdmin" type="success" @click="openAdd">新增用户</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
@@ -31,13 +31,11 @@
 
       <el-table-column label="操作" width="260">
         <template #default="{ row }">
-          <el-button size="small" @click="openEdit(row)">编辑</el-button>
-
-          <el-button size="small" type="warning" @click="openResetPwd(row)">
+          <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
+          <el-button v-if="isAdmin" size="small" type="warning" @click="openResetPwd(row)">
             重置密码
           </el-button>
-
-          <el-popconfirm title="确定删除？" @confirm="remove(row.id)">
+          <el-popconfirm v-if="isAdmin" title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
             </template>
@@ -105,7 +103,10 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { userPage, userAdd, userUpdate, userDelete, changePassword } from '../../api/user'
+import { userPage, userAdd, userUpdate, userDelete, resetPassword } from '../../api/user'
+
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 
 const q = reactive({ username: '', realName: '', role: '', status: '' })
 const page = ref(1)
@@ -212,8 +213,8 @@ function openResetPwd(row) {
 
 async function doResetPwd() {
   if (!pwdDlg.newPwd) return ElMessage.warning('请输入新密码')
-  await changePassword({ userId: pwdDlg.userId, oldPwd: '123456', newPwd: pwdDlg.newPwd })
-  ElMessage.success('重置成功（oldPwd 默认 123456）')
+  await resetPassword({ userId: pwdDlg.userId, newPwd: pwdDlg.newPwd })
+  ElMessage.success('重置成功')
   pwdDlg.visible = false
 }
 

@@ -4,10 +4,19 @@
 
     <el-form :model="form" label-width="90px">
       <el-form-item label="用户ID">
-        <el-input-number v-model="form.userId" :min="1" />
+        <el-input-number
+          v-if="isAdmin"
+          v-model="form.userId"
+          :min="1"
+        />
+        <el-input
+          v-else
+          v-model="form.userId"
+          disabled
+        />
       </el-form-item>
 
-      <el-form-item label="旧密码">
+      <el-form-item v-if="!isAdmin" label="旧密码">
         <el-input v-model="form.oldPwd" show-password />
       </el-form-item>
 
@@ -34,10 +43,13 @@
 <script setup>
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { changePassword } from '../../api/user'
+import { changePassword, resetPassword } from '../../api/user'
+
+const user = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = user && user.role === 'ADMIN'
 
 const form = reactive({
-  userId: 1,
+  userId: user && user.id ? user.id : null,
   oldPwd: '',
   newPwd: '',
   newPwd2: ''
@@ -51,11 +63,15 @@ function reset() {
 
 async function submit() {
   if (!form.userId) return ElMessage.warning('userId 必填')
-  if (!form.oldPwd) return ElMessage.warning('旧密码必填')
   if (!form.newPwd) return ElMessage.warning('新密码必填')
   if (form.newPwd !== form.newPwd2) return ElMessage.warning('两次新密码不一致')
 
-  await changePassword({ userId: form.userId, oldPwd: form.oldPwd, newPwd: form.newPwd })
+  if (isAdmin) {
+    await resetPassword({ userId: form.userId, newPwd: form.newPwd })
+  } else {
+    if (!form.oldPwd) return ElMessage.warning('旧密码必填')
+    await changePassword({ userId: form.userId, oldPwd: form.oldPwd, newPwd: form.newPwd })
+  }
   ElMessage.success('修改成功')
   reset()
 }

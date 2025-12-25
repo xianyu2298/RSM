@@ -5,7 +5,7 @@
       <el-input v-model="q.personId" placeholder="作者人员ID" style="width:140px" />
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
-      <el-button type="success" @click="openAdd">新增著作</el-button>
+      <el-button v-if="isAdmin" type="success" @click="openAdd">新增著作</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
@@ -23,8 +23,8 @@
       <el-table-column prop="isbn" label="ISBN" width="170" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
-          <el-button size="small" @click="openEdit(row)">编辑</el-button>
-          <el-popconfirm title="确定删除？" @confirm="remove(row.id)">
+          <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
+          <el-popconfirm v-if="isAdmin" title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
             </template>
@@ -83,6 +83,9 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { bookPage, bookAdd, bookUpdate, bookDelete } from '../../api/book'
+
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 
 const q = reactive({ name: '', personId: '' })
 const page = ref(1)

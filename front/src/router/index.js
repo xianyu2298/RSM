@@ -45,8 +45,27 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token')
-    if (to.path === '/login') return next()
-    if (!token) return next('/login')
+    if (to.path === '/login') {
+        return next()
+    }
+    if (!token) {
+        return next('/login')
+    }
+    const userStr = localStorage.getItem('user')
+    let role = null
+    if (userStr) {
+        try {
+            const u = JSON.parse(userStr)
+            role = u && u.role
+        } catch (e) {
+            role = null
+        }
+    }
+    if (to.path.startsWith('/user') || to.path.startsWith('/dict')) {
+        if (role !== 'ADMIN') {
+            return next('/project')
+        }
+    }
     next()
 })
 

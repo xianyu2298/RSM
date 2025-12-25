@@ -11,24 +11,31 @@
 
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
-      <el-button type="success" @click="openAdd">新增项目</el-button>
+      <el-button v-if="isAdmin" type="success" @click="openAdd">新增项目</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="projectCode" label="项目编号" width="140" />
       <el-table-column prop="name" label="项目名称" min-width="240" />
-      <el-table-column prop="natureCode" label="性质" width="120" />
-      <el-table-column prop="scopeCode" label="范围" width="120" />
+      <el-table-column prop="natureCode" label="性质" width="120">
+        <template #default="{ row }">
+          {{ dictName('PROJECT_NATURE', row.natureCode) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="scopeCode" label="范围" width="120">
+        <template #default="{ row }">
+          {{ dictName('PROJECT_SCOPE', row.scopeCode) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="startDate" label="开始" width="120" />
       <el-table-column prop="endDate" label="结束" width="120" />
       <el-table-column label="操作" width="260">
         <template #default="{ row }">
-          <el-button size="small" @click="openEdit(row)">编辑</el-button>
-          <el-button size="small" type="primary" @click="openMembers(row)">成员</el-button>
+          <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
+          <el-button v-if="isAdmin" size="small" type="primary" @click="openMembers(row)">成员</el-button>
           <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
-
-          <el-popconfirm title="确定删除？" @confirm="remove(row.id)">
+          <el-popconfirm v-if="isAdmin" title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
             </template>
@@ -140,8 +147,8 @@ const router = useRouter()
 function goDetail(id) {
   router.push(`/project/${id}`)
 }
-
-
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 const q = reactive({ name: '', natureCode: '', scopeCode: '' })
 const page = ref(1)
 const size = ref(10)
@@ -150,6 +157,18 @@ const rows = ref([])
 
 const natureItems = ref([])
 const scopeItems = ref([])
+
+function dictName(typeCode, itemCode) {
+  if (!itemCode) return '-'
+  let items = []
+  if (typeCode === 'PROJECT_NATURE') {
+    items = natureItems.value || []
+  } else if (typeCode === 'PROJECT_SCOPE') {
+    items = scopeItems.value || []
+  }
+  const hit = items.find(i => i.itemCode === itemCode)
+  return hit ? hit.itemName : itemCode
+}
 
 const dlg = reactive({ visible: false, title: '' })
 const form = reactive({

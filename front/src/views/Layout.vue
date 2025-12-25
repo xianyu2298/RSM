@@ -8,8 +8,8 @@
         <el-menu-item index="/paper">论文管理</el-menu-item>
         <el-menu-item index="/book">著作管理</el-menu-item>
         <el-menu-item index="/award">获奖管理</el-menu-item>
-        <el-menu-item index="/user">用户管理</el-menu-item>
-        <el-menu-item index="/dict">字典管理</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/user">用户管理</el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/dict">字典管理</el-menu-item>
         <el-menu-item index="/password">修改密码</el-menu-item>
       </el-menu>
     </el-aside>
@@ -43,6 +43,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const user = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = user && user.role === 'ADMIN'
 
 function logout() {
   localStorage.removeItem('token')

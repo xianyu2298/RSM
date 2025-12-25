@@ -6,6 +6,8 @@ import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -35,10 +37,35 @@ public class UserController {
     }
 
     @PutMapping("/password")
-    public Result<Void> changePwd(@RequestParam Long userId,
+    public Result<Void> changePwd(@RequestParam(required = false) Long userId,
                                   @RequestParam String oldPwd,
-                                  @RequestParam String newPwd) {
-        service.changePassword(userId, oldPwd, newPwd);
+                                  @RequestParam String newPwd,
+                                  HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        if (current == null) {
+            throw new RuntimeException("未登录");
+        }
+        Long targetId = userId;
+        if (!"ADMIN".equalsIgnoreCase(current.getRole())) {
+            targetId = current.getId();
+        } else {
+            if (targetId == null) {
+                targetId = current.getId();
+            }
+        }
+        service.changePassword(targetId, oldPwd, newPwd);
+        return Result.ok(null);
+    }
+
+    @PutMapping("/reset-password")
+    public Result<Void> resetPassword(@RequestParam Long userId,
+                                      @RequestParam String newPwd,
+                                      HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        if (current == null || !"ADMIN".equalsIgnoreCase(current.getRole())) {
+            throw new RuntimeException("无权限");
+        }
+        service.resetPassword(userId, newPwd);
         return Result.ok(null);
     }
 }

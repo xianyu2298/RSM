@@ -12,7 +12,21 @@
       <el-descriptions v-if="project" :column="3" border style="margin-top:12px">
         <el-descriptions-item label="项目编号">{{ project.projectCode }}</el-descriptions-item>
         <el-descriptions-item label="项目名称">{{ project.name }}</el-descriptions-item>
-        <el-descriptions-item label="项目状态">{{ dictName('PROJECT_STATUS', project.statusCode) }}</el-descriptions-item>
+        <el-descriptions-item label="项目状态">
+          <template v-if="isAdmin">
+            <el-select v-model="project.statusCode" style="width:160px" @change="updateStatus">
+              <el-option
+                  v-for="i in dictMap['PROJECT_STATUS'] || []"
+                  :key="i.itemCode"
+                  :label="i.itemName"
+                  :value="i.itemCode"
+              />
+            </el-select>
+          </template>
+          <template v-else>
+            {{ dictName('PROJECT_STATUS', project.statusCode) }}
+          </template>
+        </el-descriptions-item>
 
         <el-descriptions-item label="项目性质">{{ dictName('PROJECT_NATURE', project.natureCode) }}</el-descriptions-item>
         <el-descriptions-item label="项目范围">{{ dictName('PROJECT_SCOPE', project.scopeCode) }}</el-descriptions-item>
@@ -30,7 +44,7 @@
       <el-tabs v-model="active">
         <!-- 成员 -->
         <el-tab-pane label="成员" name="member">
-          <el-button type="success" @click="openAddMember">新增成员</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openAddMember">新增成员</el-button>
           <el-table :data="members" border style="margin-top:10px">
             <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="personId" label="人员ID" width="100"/>
@@ -39,7 +53,7 @@
             <el-table-column prop="duty" label="职责" width="140"/>
             <el-table-column prop="joinDate" label="加入日期" width="140"/>
             <el-table-column prop="remark" label="备注"/>
-            <el-table-column label="操作" width="120">
+            <el-table-column v-if="isAdmin" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="移除该成员？" @confirm="delMember(row.id)">
                   <template #reference>
@@ -53,7 +67,7 @@
 
         <!-- 获奖 -->
         <el-tab-pane label="获奖" name="award">
-          <el-button type="success" @click="openAddAward">新增获奖</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openAddAward">新增获奖</el-button>
           <el-table :data="awards" border style="margin-top:10px">
             <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="awardName" label="奖项名称"/>
@@ -61,7 +75,7 @@
             <el-table-column prop="awardOrg" label="授奖单位"/>
             <el-table-column prop="awardDate" label="获奖日期" width="140"/>
             <el-table-column prop="remark" label="备注"/>
-            <el-table-column label="操作" width="120">
+            <el-table-column v-if="isAdmin" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="删除该记录？" @confirm="delAward(row.id)">
                   <template #reference>
@@ -75,7 +89,7 @@
 
         <!-- 论文 -->
         <el-tab-pane label="论文" name="paper">
-          <el-button type="success" @click="openBindPaper">绑定论文</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openBindPaper">绑定论文</el-button>
 
           <el-table :data="projectPapers" border style="margin-top:10px">
             <el-table-column prop="id" label="关联ID" width="90"/>
@@ -85,7 +99,7 @@
             <el-table-column prop="indexCode" label="检索源" width="120"/>
             <el-table-column prop="publishDate" label="发表日期" width="140"/>
             <el-table-column prop="doi" label="DOI" width="180"/>
-            <el-table-column label="操作" width="120">
+            <el-table-column v-if="isAdmin" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="解绑该论文？" @confirm="unbindPaper(row.id)">
                   <template #reference>
@@ -99,7 +113,7 @@
 
 
         <el-tab-pane label="著作" name="book">
-          <el-button type="success" @click="openBindBook">绑定著作</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openBindBook">绑定著作</el-button>
 
           <el-table :data="projectBooks" border style="margin-top:10px">
             <el-table-column prop="id" label="关联ID" width="90"/>
@@ -108,7 +122,7 @@
             <el-table-column prop="publisher" label="出版社" width="200"/>
             <el-table-column prop="publishDate" label="出版日期" width="140"/>
             <el-table-column prop="isbn" label="ISBN" width="180"/>
-            <el-table-column label="操作" width="120">
+            <el-table-column v-if="isAdmin" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="解绑该著作？" @confirm="unbindBook(row.id)">
                   <template #reference>
@@ -277,7 +291,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 import { dictItems } from '../../api/dict'
-import { projectGet } from '../../api/project'
+import { projectGet, projectUpdate } from '../../api/project'
 import { memberList, memberAdd, memberDelete } from '../../api/projectMember'
 import { awardPage, awardAdd, awardDelete } from '../../api/award'
 import { paperPage } from '../../api/paper'
@@ -287,6 +301,8 @@ import { pagePerson } from '../../api/person'
 import { projectPaperList, projectPaperBind, projectPaperUnbind } from '../../api/projectPaper'
 import { projectBookList, projectBookBind, projectBookUnbind } from '../../api/projectBook'
 
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 
 const route = useRoute()
 const router = useRouter()
@@ -332,6 +348,13 @@ async function loadAll() {
   projectPapers.value = await projectPaperList(projectId)
   projectBooks.value = await projectBookList(projectId)
 
+}
+
+async function updateStatus(value) {
+  if (!project.value) return
+  project.value.statusCode = value
+  await projectUpdate(project.value)
+  ElMessage.success('项目状态已更新')
 }
 
 function back() {

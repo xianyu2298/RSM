@@ -11,7 +11,7 @@
       <el-form-item>
         <el-button type="primary" @click="load">查询</el-button>
         <el-button @click="reset">重置</el-button>
-        <el-button type="success" @click="openAdd">新增人员</el-button>
+        <el-button v-if="isAdmin" type="success" @click="openAdd">新增人员</el-button>
       </el-form-item>
     </el-form>
 
@@ -30,9 +30,9 @@
 
       <el-table-column label="操作" width="180">
         <template #default="scope">
-          <el-button size="small" @click="openEdit(scope.row)">编辑</el-button>
+          <el-button v-if="isAdmin" size="small" @click="openEdit(scope.row)">编辑</el-button>
           <el-button size="small" type="primary" @click="goDetail(scope.row.id)">详情</el-button>
-          <el-button size="small" type="danger" @click="remove(scope.row.id)">删除</el-button>
+          <el-button v-if="isAdmin" size="small" type="danger" @click="remove(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
 
@@ -93,9 +93,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const goDetail = (id) => router.push(`/person/${id}`)
-
-
-
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 const query = reactive({
   page: 1,
   size: 10,

@@ -9,7 +9,7 @@
       </div>
     </el-card>
 
-    <el-card style="margin-top:12px">
+    <el-card v-if="isAdmin" style="margin-top:12px">
       <el-tabs v-model="active">
         <!-- 字典类型 -->
         <el-tab-pane label="字典类型" name="type">
@@ -206,6 +206,9 @@ import {
   dictTypePage, dictTypeList, dictTypeAdd, dictTypeUpdate, dictTypeDelete,
   dictItemPage, dictItemAdd, dictItemUpdate, dictItemDelete
 } from '../../api/dict'
+
+const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+const isAdmin = currentUser && currentUser.role === 'ADMIN'
 
 const active = ref('type')
 

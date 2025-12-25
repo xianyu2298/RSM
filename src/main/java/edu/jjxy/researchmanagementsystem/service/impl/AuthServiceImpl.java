@@ -4,6 +4,7 @@ import edu.jjxy.researchmanagementsystem.dto.LoginReq;
 import edu.jjxy.researchmanagementsystem.dto.LoginResp;
 import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.mapper.UserMapper;
+import edu.jjxy.researchmanagementsystem.security.TokenStore;
 import edu.jjxy.researchmanagementsystem.service.AuthService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -15,9 +16,11 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
+    private final TokenStore tokenStore;
 
-    public AuthServiceImpl(UserMapper userMapper) {
+    public AuthServiceImpl(UserMapper userMapper, TokenStore tokenStore) {
         this.userMapper = userMapper;
+        this.tokenStore = tokenStore;
     }
 
     @Override
@@ -53,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
         if (!ok) throw new RuntimeException("密码错误");
 
         String token = UUID.randomUUID().toString().replace("-", "");
+        tokenStore.put(token, db);
         return new LoginResp(db.getId(), db.getUsername(), db.getRealName(), db.getRole(), token);
     }
 

@@ -49,4 +49,10 @@ public class UserServiceImpl implements UserService {
         mapper.updatePassword(userId,
                 DigestUtils.md5DigestAsHex(newPwd.getBytes()));
     }
+
+    @Override
+    public void resetPassword(Long userId, String newPwd) {
+        mapper.updatePassword(userId,
+                DigestUtils.md5DigestAsHex(newPwd.getBytes()));
+    }
 }
