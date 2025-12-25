@@ -29,10 +29,9 @@
       </el-table-column>
       <el-table-column prop="startDate" label="开始" width="120" />
       <el-table-column prop="endDate" label="结束" width="120" />
-      <el-table-column label="操作" width="260">
+      <el-table-column label="操作" width="220">
         <template #default="{ row }">
           <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
-          <el-button v-if="isAdmin" size="small" type="primary" @click="openMembers(row)">成员</el-button>
           <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
           <el-popconfirm v-if="isAdmin" title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
@@ -85,8 +84,24 @@
             style="width:100%"
         />
       </el-form-item>
-      <el-form-item label="负责人ID">
-        <el-input-number v-model="form.leaderPersonId" :min="1" />
+      <el-form-item label="负责人">
+        <el-select
+            v-model="form.leaderPersonId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="输入姓名或工号搜索负责人"
+            :remote-method="remoteSearchLeader"
+            :loading="leaderLoading"
+            style="width:100%"
+        >
+          <el-option
+              v-for="p in leaderOptions"
+              :key="p.id"
+              :label="`${p.empNo} - ${p.name}`"
+              :value="p.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="预算">
         <el-input-number v-model="form.budget" :min="0" :step="1000" />
@@ -102,34 +117,6 @@
     </template>
   </el-dialog>
 
-  <!-- 成员维护 -->
-  <el-dialog v-model="memDlg.visible" :title="memDlg.title" width="820px">
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <el-input v-model="memForm.duty" placeholder="职责" style="width:200px" />
-      <el-date-picker v-model="memForm.joinDate" type="date" value-format="YYYY-MM-DD" placeholder="加入日期" />
-      <el-input v-model="memForm.remark" placeholder="备注" style="width:200px" />
-      <el-button type="primary" @click="addMember">添加成员</el-button>
-    </div>
-
-    <el-table :data="members" border>
-      <el-table-column prop="duty" label="职责" width="160" />
-      <el-table-column prop="joinDate" label="加入日期" width="140" />
-      <el-table-column prop="remark" label="备注" />
-      <el-table-column label="操作" width="120">
-        <template #default="{ row }">
-          <el-popconfirm title="移除该成员？" @confirm="delMember(row.id)">
-            <template #reference>
-              <el-button size="small" type="danger">移除</el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <template #footer>
-      <el-button @click="memDlg.visible=false">关闭</el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup>
@@ -137,7 +124,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { dictItems } from '../../api/dict'
 import { projectPage, projectAdd, projectUpdate, projectDelete } from '../../api/project'
-import { memberList, memberAdd, memberDelete } from '../../api/projectMember'
+import { pagePerson, personGet } from '../../api/person'
 import { useRouter } from 'vue-router'
 import { getCurrentUser, isAdminUser } from '../../utils/http'
 const router = useRouter()
@@ -154,6 +141,9 @@ const rows = ref([])
 
 const natureItems = ref([])
 const scopeItems = ref([])
+
+const leaderOptions = ref([])
+const leaderLoading = ref(false)
 
 function dictName(typeCode, itemCode) {
   if (!itemCode) return '-'
@@ -175,10 +165,6 @@ const form = reactive({
   leaderPersonId: null, budget: null, remark: ''
 })
 const dateRange = ref([])
-
-const memDlg = reactive({ visible: false, title: '', projectId: null })
-const members = ref([])
-const memForm = reactive({ personId: 1, duty: '成员', joinDate: '', remark: '' })
 
 async function loadDict() {
   natureItems.value = await dictItems('PROJECT_NATURE')
@@ -206,6 +192,7 @@ function reset() {
 function openAdd() {
   dlg.title = '新增项目'
   dlg.visible = true
+  leaderOptions.value = []
   Object.assign(form, {
     id: null, projectCode: '', name: '',
     natureCode: '', scopeCode: '',
@@ -215,11 +202,25 @@ function openAdd() {
   dateRange.value = []
 }
 
-function openEdit(row) {
+async function openEdit(row) {
   dlg.title = '编辑项目'
   dlg.visible = true
   Object.assign(form, row)
   dateRange.value = [row.startDate || '', row.endDate || '']
+  leaderOptions.value = []
+  if (row.leaderPersonId) {
+    try {
+      const p = await personGet(row.leaderPersonId)
+      if (p) {
+        leaderOptions.value = [{
+          id: p.id,
+          empNo: p.empNo,
+          name: p.name
+        }]
+      }
+    } catch (e) {
+    }
+  }
 }
 
 async function save() {
@@ -245,38 +246,22 @@ async function remove(id) {
   load()
 }
 
-async function openMembers(row) {
-  memDlg.visible = true
-  memDlg.title = `成员维护：${row.name}（项目ID=${row.id}）`
-  memDlg.projectId = row.id
-  memForm.personId = 1
-  memForm.duty = '成员'
-  memForm.joinDate = ''
-  memForm.remark = ''
-  await reloadMembers()
-}
-
-async function reloadMembers() {
-  members.value = await memberList(memDlg.projectId)
-}
-
-async function addMember() {
-  if (!memForm.personId) return ElMessage.warning('人员ID必填')
-  await memberAdd({
-    projectId: memDlg.projectId,
-    personId: memForm.personId,
-    duty: memForm.duty,
-    joinDate: memForm.joinDate,
-    remark: memForm.remark
-  })
-  ElMessage.success('添加成功')
-  await reloadMembers()
-}
-
-async function delMember(id) {
-  await memberDelete(id)
-  ElMessage.success('移除成功')
-  await reloadMembers()
+async function remoteSearchLeader(keyword) {
+  if (!keyword || keyword.trim() === '') {
+    leaderOptions.value = []
+    return
+  }
+  leaderLoading.value = true
+  try {
+    const r1 = await pagePerson({ page: 1, size: 10, name: keyword })
+    const r2 = await pagePerson({ page: 1, size: 10, empNo: keyword })
+    const map = new Map()
+    ;(r1.records || []).forEach(p => map.set(p.id, p))
+    ;(r2.records || []).forEach(p => map.set(p.id, p))
+    leaderOptions.value = Array.from(map.values())
+  } finally {
+    leaderLoading.value = false
+  }
 }
 
 onMounted(async () => {

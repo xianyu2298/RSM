@@ -19,9 +19,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResult<User> page(int page, int size, String username) {
+    public PageResult<User> page(int page, int size, String username, String realName, String role, Integer status) {
         PageHelper.startPage(page, size);
-        PageInfo<User> info = new PageInfo<>(mapper.page(username));
+        PageInfo<User> info = new PageInfo<>(mapper.page(username, realName, role, status));
         return new PageResult<>(info.getTotal(), info.getList());
     }
 

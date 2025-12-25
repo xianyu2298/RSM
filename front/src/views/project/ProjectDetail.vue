@@ -42,7 +42,7 @@
       <el-tabs v-model="active">
         <!-- 成员 -->
         <el-tab-pane label="成员" name="member">
-          <el-button v-if="isAdmin" type="success" @click="openAddMember">新增成员</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openAddMember">绑定成员</el-button>
           <el-table :data="members" border style="margin-top:10px">
             <el-table-column prop="empNo" label="工号" width="120" />
             <el-table-column prop="personName" label="姓名" width="120" />
@@ -63,7 +63,7 @@
 
         <!-- 获奖 -->
         <el-tab-pane label="获奖" name="award">
-          <el-button v-if="isAdmin" type="success" @click="openAddAward">新增获奖</el-button>
+          <el-button v-if="isAdmin" type="success" @click="openBindAward">绑定获奖</el-button>
           <el-table :data="awards" border style="margin-top:10px">
             <el-table-column prop="id" label="ID" width="80"/>
             <el-table-column prop="awardName" label="奖项名称"/>
@@ -73,9 +73,9 @@
             <el-table-column prop="remark" label="备注"/>
             <el-table-column v-if="isAdmin" label="操作" width="120">
               <template #default="{ row }">
-                <el-popconfirm title="删除该记录？" @confirm="delAward(row.id)">
+                <el-popconfirm title="解绑该获奖记录？" @confirm="unbindAward(row.id)">
                   <template #reference>
-                    <el-button size="small" type="danger">删除</el-button>
+                    <el-button size="small" type="danger">解绑</el-button>
                   </template>
                 </el-popconfirm>
               </template>
@@ -134,7 +134,7 @@
     </el-card>
 
     <!-- 新增成员弹窗（远程搜索人员：输入姓名/工号） -->
-    <el-dialog v-model="memberDlg.visible" title="新增成员" width="520px">
+    <el-dialog v-model="memberDlg.visible" title="绑定成员" width="520px">
       <el-form :model="memberDlg.form" label-width="90px">
         <el-form-item label="选择人员">
           <el-select
@@ -174,42 +174,7 @@
 
       <template #footer>
         <el-button @click="memberDlg.visible=false">取消</el-button>
-        <el-button type="primary" @click="submitAddMember">保存</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- 新增获奖弹窗 -->
-    <el-dialog v-model="awardDlg.visible" title="新增获奖" width="520px">
-      <el-form :model="awardDlg.form" label-width="90px">
-        <el-form-item label="奖项名称">
-          <el-input v-model="awardDlg.form.awardName"/>
-        </el-form-item>
-
-        <el-form-item label="奖项级别">
-          <el-input v-model="awardDlg.form.awardLevel"/>
-        </el-form-item>
-
-        <el-form-item label="授奖单位">
-          <el-input v-model="awardDlg.form.awardOrg"/>
-        </el-form-item>
-
-        <el-form-item label="获奖日期">
-          <el-date-picker
-              v-model="awardDlg.form.awardDate"
-              type="date"
-              value-format="YYYY-MM-DD"
-              style="width:100%"
-          />
-        </el-form-item>
-
-        <el-form-item label="备注">
-          <el-input v-model="awardDlg.form.remark"/>
-        </el-form-item>
-      </el-form>
-
-      <template #footer>
-        <el-button @click="awardDlg.visible=false">取消</el-button>
-        <el-button type="primary" @click="submitAddAward">保存</el-button>
+        <el-button type="primary" @click="submitAddMember">绑定</el-button>
       </template>
     </el-dialog>
 
@@ -278,6 +243,38 @@
       </div>
     </el-dialog>
 
+    <!-- 绑定获奖弹窗 -->
+    <el-dialog v-model="awardBindDlg.visible" title="绑定获奖" width="900px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <el-input v-model="awardBindDlg.keyword" placeholder="按奖项名称搜索" style="width:260px" />
+        <el-button type="primary" @click="searchAwardLibrary">查询</el-button>
+      </div>
+
+      <el-table :data="awardBindDlg.list" border>
+        <el-table-column prop="id" label="获奖ID" width="90" />
+        <el-table-column prop="awardName" label="奖项名称" />
+        <el-table-column prop="awardLevel" label="级别" width="140" />
+        <el-table-column prop="awardOrg" label="授奖单位" width="200" />
+        <el-table-column prop="awardDate" label="获奖日期" width="140" />
+        <el-table-column label="操作" width="110">
+          <template #default="{ row }">
+            <el-button size="small" type="success" @click="bindAward(row.id)">绑定</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="margin-top:10px;display:flex;justify-content:flex-end">
+        <el-pagination
+            background
+            layout="prev, pager, next, total"
+            :total="awardBindDlg.total"
+            :page-size="awardBindDlg.size"
+            v-model:current-page="awardBindDlg.page"
+            @current-change="searchAwardLibrary"
+        />
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -289,7 +286,7 @@ import { ElMessage } from 'element-plus'
 import { dictItems } from '../../api/dict'
 import { projectGet, projectUpdate } from '../../api/project'
 import { memberList, memberAdd, memberDelete } from '../../api/projectMember'
-import { awardPage, awardAdd, awardDelete } from '../../api/award'
+import { awardPage, awardBindProject, awardUnbindProject } from '../../api/award'
 import { paperPage } from '../../api/paper'
 import { bookPage } from '../../api/book'
 import { pagePerson } from '../../api/person'
@@ -374,7 +371,7 @@ async function submitAddMember() {
   if (!memberDlg.form.personId) return ElMessage.warning('请选择人员')
   if (!memberDlg.form.joinDate) return ElMessage.warning('请选择加入日期')
   await memberAdd(memberDlg.form)
-  ElMessage.success('新增成员成功')
+  ElMessage.success('绑定成员成功')
   memberDlg.visible = false
   members.value = await memberList(projectId)
 }
@@ -408,33 +405,14 @@ async function remoteSearchPerson(keyword) {
   }
 }
 
-/** 获奖新增 */
-const awardDlg = reactive({
+const awardBindDlg = reactive({
   visible: false,
-  form: { projectId, awardName: '', awardLevel: '', awardOrg: '', awardDate: '', remark: '' }
+  keyword: '',
+  page: 1,
+  size: 8,
+  total: 0,
+  list: []
 })
-
-function openAddAward() {
-  awardDlg.form = { projectId, awardName: '', awardLevel: '', awardOrg: '', awardDate: '', remark: '' }
-  awardDlg.visible = true
-}
-
-async function submitAddAward() {
-  if (!awardDlg.form.awardName) return ElMessage.warning('请输入奖项名称')
-  if (!awardDlg.form.awardDate) return ElMessage.warning('请选择获奖日期')
-  await awardAdd(awardDlg.form)
-  ElMessage.success('新增获奖成功')
-  awardDlg.visible = false
-  const a = await awardPage({ page: 1, size: 100, projectId })
-  awards.value = a.records || []
-}
-
-async function delAward(id) {
-  await awardDelete(id)
-  ElMessage.success('删除成功')
-  const a = await awardPage({ page: 1, size: 100, projectId })
-  awards.value = a.records || []
-}
 // ===================== 论文 / 著作：绑定弹窗状态 =====================
 
 // 论文绑定弹窗
@@ -523,6 +501,36 @@ async function unbindBook(id) {
   await projectBookUnbind(id)
   ElMessage.success('解绑成功')
   projectBooks.value = await projectBookList(projectId)
+}
+
+async function openBindAward() {
+  awardBindDlg.visible = true
+  awardBindDlg.page = 1
+  await searchAwardLibrary()
+}
+
+async function searchAwardLibrary() {
+  const res = await awardPage({
+    page: awardBindDlg.page,
+    size: awardBindDlg.size,
+    awardName: awardBindDlg.keyword || undefined
+  })
+  awardBindDlg.list = res.records || []
+  awardBindDlg.total = res.total || 0
+}
+
+async function bindAward(awardId) {
+  await awardBindProject({ awardId, projectId })
+  ElMessage.success('绑定获奖成功')
+  const a = await awardPage({ page: 1, size: 100, projectId })
+  awards.value = a.records || []
+}
+
+async function unbindAward(id) {
+  await awardUnbindProject({ awardId: id })
+  ElMessage.success('解绑成功')
+  const a = await awardPage({ page: 1, size: 100, projectId })
+  awards.value = a.records || []
 }
 
 

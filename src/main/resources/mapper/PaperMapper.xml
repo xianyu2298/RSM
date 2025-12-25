@@ -13,10 +13,10 @@
         p.publish_date,
         p.doi,
         p.remark,
-        rp.emp_no AS empNo,
-        rp.name   AS personName
+        u.emp_no      AS empNo,
+        u.real_name   AS personName
         FROM research_paper p
-        LEFT JOIN research_person rp ON rp.id = p.person_id
+        LEFT JOIN sys_user u ON u.id = p.person_id
         <where>
             <if test="title != null and title != ''">
                 AND p.title LIKE CONCAT('%', #{title}, '%')

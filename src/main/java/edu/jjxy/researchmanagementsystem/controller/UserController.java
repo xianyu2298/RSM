@@ -21,8 +21,11 @@ public class UserController {
     @GetMapping("/page")
     public Result<PageResult<User>> page(@RequestParam(defaultValue="1") int page,
                                          @RequestParam(defaultValue="10") int size,
-                                         @RequestParam(required=false) String username) {
-        return Result.ok(service.page(page, size, username));
+                                         @RequestParam(required=false) String username,
+                                         @RequestParam(required=false) String realName,
+                                         @RequestParam(required=false) String role,
+                                         @RequestParam(required=false) Integer status) {
+        return Result.ok(service.page(page, size, username, realName, role, status));
     }
 
     @PostMapping

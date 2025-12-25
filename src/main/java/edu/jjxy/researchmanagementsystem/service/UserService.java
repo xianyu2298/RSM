@@ -4,7 +4,7 @@ import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.entity.User;
 
 public interface UserService {
-    PageResult<User> page(int page, int size, String username);
+    PageResult<User> page(int page, int size, String username, String realName, String role, Integer status);
     Long add(User u);
     void update(User u);
     void enable(Long id, Integer status);

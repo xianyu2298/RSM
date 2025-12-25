@@ -50,8 +50,24 @@
   <!-- 新增/编辑 -->
   <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
-      <el-form-item label="作者人员ID">
-        <el-input v-model="form.personId" />
+      <el-form-item label="作者">
+        <el-select
+            v-model="form.personId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="输入姓名或工号搜索作者"
+            :remote-method="remoteSearchPerson"
+            :loading="personLoading"
+            style="width:100%"
+        >
+          <el-option
+              v-for="p in personOptions"
+              :key="p.id"
+              :label="`${p.empNo} - ${p.name}`"
+              :value="p.id"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="论文标题">
@@ -93,6 +109,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { dictItems } from '../../api/dict'
 import { paperPage, paperAdd, paperUpdate, paperDelete } from '../../api/paper'
+import { pagePerson } from '../../api/person'
 import { getCurrentUser, isAdminUser } from '../../utils/http'
 
 const currentUser = getCurrentUser()
@@ -109,7 +126,7 @@ const indexItems = ref([])
 const dlg = reactive({ visible: false, title: '' })
 const form = reactive({
   id: null,
-  personId: 1,
+  personId: null,
   title: '',
   journal: '',
   indexCode: '',
@@ -117,6 +134,9 @@ const form = reactive({
   doi: '',
   remark: ''
 })
+
+const personOptions = ref([])
+const personLoading = ref(false)
 
 async function loadDict() {
   // 论文检索源字典：EI/SCI/核心/一般
@@ -144,9 +164,10 @@ function reset() {
 function openAdd() {
   dlg.title = '新增论文'
   dlg.visible = true
+  personOptions.value = []
   Object.assign(form, {
     id: null,
-    personId: '',
+    personId: null,
     title: '',
     journal: '',
     indexCode: '',
@@ -160,10 +181,17 @@ function openEdit(row) {
   dlg.title = '编辑论文'
   dlg.visible = true
   Object.assign(form, row)
+  personOptions.value = row.personId
+    ? [{
+      id: row.personId,
+      empNo: row.empNo,
+      name: row.personName
+    }]
+    : []
 }
 
 async function save() {
-  if (!form.personId) return ElMessage.warning('人员ID必填')
+  if (!form.personId) return ElMessage.warning('请选择作者')
   if (!form.title) return ElMessage.warning('论文标题必填')
   if (!form.indexCode) return ElMessage.warning('请选择检索源')
 
@@ -179,6 +207,24 @@ async function remove(id) {
   await paperDelete(id)
   ElMessage.success('删除成功')
   load()
+}
+
+async function remoteSearchPerson(keyword) {
+  if (!keyword || keyword.trim() === '') {
+    personOptions.value = []
+    return
+  }
+  personLoading.value = true
+  try {
+    const r1 = await pagePerson({ page: 1, size: 10, name: keyword })
+    const r2 = await pagePerson({ page: 1, size: 10, empNo: keyword })
+    const map = new Map()
+    ;(r1.records || []).forEach(p => map.set(p.id, p))
+    ;(r2.records || []).forEach(p => map.set(p.id, p))
+    personOptions.value = Array.from(map.values())
+  } finally {
+    personLoading.value = false
+  }
 }
 
 onMounted(async () => {

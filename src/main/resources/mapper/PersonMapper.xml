@@ -4,56 +4,73 @@
 <mapper namespace="edu.jjxy.researchmanagementsystem.mapper.PersonMapper">
 
     <sql id="BaseColumns">
-        id, emp_no, name, gender, title, department, phone, email, hire_date, remark
+        id,
+        emp_no,
+        real_name AS name,
+        gender,
+        title,
+        department,
+        phone,
+        email,
+        hire_date AS hireDate,
+        remark
     </sql>
 
     <sql id="WhereClause">
         <where>
             <if test="name != null and name != ''">
-                AND name LIKE CONCAT('%', #{name}, '%')
+                AND real_name LIKE CONCAT('%', #{name}, '%')
             </if>
             <if test="empNo != null and empNo != ''">
                 AND emp_no LIKE CONCAT('%', #{empNo}, '%')
             </if>
+            AND role = 'USER'
         </where>
     </sql>
 
-    <!-- 分页查询 -->
     <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
         SELECT <include refid="BaseColumns"/>
-        FROM research_person
+        FROM sys_user
         <include refid="WhereClause"/>
         ORDER BY id ASC
         LIMIT #{offset}, #{size}
     </select>
 
-    <!-- 总数 -->
     <select id="count" resultType="long">
         SELECT COUNT(1)
-        FROM research_person
+        FROM sys_user
         <include refid="WhereClause"/>
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Person">
         SELECT <include refid="BaseColumns"/>
-        FROM research_person
+        FROM sys_user
         WHERE id = #{id}
+          AND role = 'USER'
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO research_person(emp_no, name, gender, title, department, phone, email, hire_date, remark)
-        VALUES (#{empNo}, #{name}, #{gender}, #{title}, #{department}, #{phone}, #{email}, #{hireDate}, #{remark})
+        INSERT INTO sys_user(username, password_hash, real_name, emp_no, gender, title, department, phone, email, hire_date, remark, role, status, created_at)
+        VALUES (#{empNo}, #{passwordHash}, #{name}, #{empNo}, #{gender}, #{title}, #{department}, #{phone}, #{email}, #{hireDate}, #{remark}, 'USER', 1, NOW())
     </insert>
 
     <update id="update">
-        UPDATE research_person
-        SET emp_no=#{empNo}, name=#{name}, gender=#{gender}, title=#{title}, department=#{department},
-            phone=#{phone}, email=#{email}, hire_date=#{hireDate}, remark=#{remark}
+        UPDATE sys_user
+        SET emp_no=#{empNo},
+            real_name=#{name},
+            gender=#{gender},
+            title=#{title},
+            department=#{department},
+            phone=#{phone},
+            email=#{email},
+            hire_date=#{hireDate},
+            remark=#{remark}
         WHERE id = #{id}
+          AND role = 'USER'
     </update>
 
     <delete id="deleteById">
-        DELETE FROM research_person WHERE id = #{id}
+        DELETE FROM sys_user WHERE id = #{id} AND role = 'USER'
     </delete>
 
 </mapper>

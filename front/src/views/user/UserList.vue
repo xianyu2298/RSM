@@ -19,9 +19,13 @@
 
     <el-table :data="rows" style="margin-top:12px" border>
       <el-table-column prop="id" label="用户ID" width="90" />
-      <el-table-column prop="username" label="用户名" width="160" />
-      <el-table-column prop="realName" label="姓名" width="160" />
-      <el-table-column prop="role" label="角色" width="120" />
+      <el-table-column prop="username" label="用户名" width="140" />
+      <el-table-column prop="empNo" label="工号" width="140" />
+      <el-table-column prop="realName" label="姓名" width="140" />
+      <el-table-column prop="department" label="单位" width="180" />
+      <el-table-column prop="phone" label="电话" width="140" />
+      <el-table-column prop="email" label="邮箱" width="200" />
+      <el-table-column prop="role" label="角色" width="110" />
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{ row }">
           <el-tag v-if="row.status === 1" type="success">启用</el-tag>
@@ -57,13 +61,37 @@
   </el-card>
 
   <!-- 新增/编辑 -->
-  <el-dialog v-model="dlg.visible" :title="dlg.title" width="560px">
+  <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
       <el-form-item label="用户名">
         <el-input v-model="form.username" :disabled="!!form.id" placeholder="登录用户名" />
       </el-form-item>
+      <el-form-item label="工号">
+        <el-input v-model="form.empNo" />
+      </el-form-item>
       <el-form-item label="姓名">
         <el-input v-model="form.realName" />
+      </el-form-item>
+      <el-form-item label="性别">
+        <el-select v-model="form.gender" style="width:100%">
+          <el-option label="男" value="男" />
+          <el-option label="女" value="女" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="职称">
+        <el-input v-model="form.title" />
+      </el-form-item>
+      <el-form-item label="单位">
+        <el-input v-model="form.department" />
+      </el-form-item>
+      <el-form-item label="电话">
+        <el-input v-model="form.phone" />
+      </el-form-item>
+      <el-form-item label="邮箱">
+        <el-input v-model="form.email" />
+      </el-form-item>
+      <el-form-item label="入职日期">
+        <el-date-picker v-model="form.hireDate" type="date" value-format="YYYY-MM-DD" style="width:100%" />
       </el-form-item>
       <el-form-item label="角色">
         <el-select v-model="form.role" style="width:100%">
@@ -76,6 +104,9 @@
           <el-option label="启用" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
+      </el-form-item>
+      <el-form-item label="备注">
+        <el-input v-model="form.remark" type="textarea" />
       </el-form-item>
 
       <el-form-item v-if="!form.id" label="初始密码">
@@ -119,7 +150,15 @@ const dlg = reactive({ visible: false, title: '' })
 const form = reactive({
   id: null,
   username: '',
+  empNo: '',
   realName: '',
+  gender: '',
+  title: '',
+  department: '',
+  phone: '',
+  email: '',
+  hireDate: '',
+  remark: '',
   role: 'USER',
   status: 1,
   initPwd: ''
@@ -155,7 +194,15 @@ function openAdd() {
   Object.assign(form, {
     id: null,
     username: '',
+    empNo: '',
     realName: '',
+    gender: '',
+    title: '',
+    department: '',
+    phone: '',
+    email: '',
+    hireDate: '',
+    remark: '',
     role: 'USER',
     status: 1,
     initPwd: ''
@@ -168,7 +215,15 @@ function openEdit(row) {
   Object.assign(form, {
     id: row.id,
     username: row.username,
+    empNo: row.empNo || '',
     realName: row.realName,
+    gender: row.gender || '',
+    title: row.title || '',
+    department: row.department || '',
+    phone: row.phone || '',
+    email: row.email || '',
+    hireDate: row.hireDate || '',
+    remark: row.remark || '',
     role: row.role,
     status: row.status,
     initPwd: ''
@@ -185,7 +240,15 @@ async function save() {
     // 这里把 initPwd 一起传给后端（你后端如果不接收也没关系，会忽略）
     await userAdd({
       username: form.username,
+      empNo: form.empNo,
       realName: form.realName,
+      gender: form.gender,
+      title: form.title,
+      department: form.department,
+      phone: form.phone,
+      email: form.email,
+      hireDate: form.hireDate,
+      remark: form.remark,
       role: form.role,
       status: form.status,
       initPwd: form.initPwd

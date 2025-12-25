@@ -29,4 +29,13 @@ public class AwardServiceImpl implements AwardService {
     public List<Award> listByPersonId(Long personId) {
         return mapper.listByPersonId(personId);
     }
+    @Override
+    public void bindToProject(Long awardId, Long projectId) {
+        mapper.updateProject(awardId, projectId);
+    }
+
+    @Override
+    public void unbindFromProject(Long awardId) {
+        mapper.updateProject(awardId, null);
+    }
 }

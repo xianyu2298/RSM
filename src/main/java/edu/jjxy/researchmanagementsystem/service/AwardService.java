@@ -12,4 +12,6 @@ public interface AwardService {
     void delete(Long id);
     Award get(Long id);
     List<Award> listByPersonId(Long personId);
+    void bindToProject(Long awardId, Long projectId);
+    void unbindFromProject(Long awardId);
 }

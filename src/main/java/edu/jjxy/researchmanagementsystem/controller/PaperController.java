@@ -3,8 +3,11 @@ package edu.jjxy.researchmanagementsystem.controller;
 import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.common.Result;
 import edu.jjxy.researchmanagementsystem.entity.Paper;
+import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.service.PaperService;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/paper")
@@ -17,8 +20,14 @@ public class PaperController {
                                           @RequestParam(defaultValue="10") int size,
                                           @RequestParam(required=false) String title,
                                           @RequestParam(required=false) Long personId,
-                                          @RequestParam(required=false) String indexCode){
-        return Result.ok(service.page(page, size, title, personId, indexCode));
+                                          @RequestParam(required=false) String indexCode,
+                                          HttpServletRequest request){
+        User current = (User) request.getAttribute("currentUser");
+        Long effectivePersonId = personId;
+        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
+            effectivePersonId = current.getId();
+        }
+        return Result.ok(service.page(page, size, title, effectivePersonId, indexCode));
     }
 
     @PostMapping public Result<Long> add(@RequestBody Paper p){ return Result.ok(service.add(p)); }

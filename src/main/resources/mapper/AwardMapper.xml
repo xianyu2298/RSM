@@ -14,11 +14,11 @@
         a.remark,
         p.project_code AS projectCode,
         p.name         AS projectName,
-        GROUP_CONCAT(DISTINCT CONCAT(rp.emp_no, '-', rp.name) SEPARATOR '，') AS awardPersons
+        GROUP_CONCAT(DISTINCT CONCAT(u.emp_no, '-', u.real_name) SEPARATOR '，') AS awardPersons
         FROM research_award a
         LEFT JOIN research_project p ON p.id = a.project_id
         LEFT JOIN research_project_member pm ON pm.project_id = a.project_id
-        LEFT JOIN research_person rp ON rp.id = pm.person_id
+        LEFT JOIN sys_user u ON u.id = pm.person_id
         <where>
             <if test="projectId != null">
                 AND a.project_id = #{projectId}
@@ -43,6 +43,12 @@
         VALUES (#{projectId}, #{awardName}, #{awardLevel}, #{awardOrg}, #{awardDate}, #{remark})
     </insert>
 
+    <update id="updateProject">
+        UPDATE research_award
+        SET project_id = #{projectId}
+        WHERE id = #{id}
+    </update>
+
     <update id="update">
         UPDATE research_award
         SET project_id=#{projectId}, award_name=#{awardName}, award_level=#{awardLevel},
@@ -65,14 +71,14 @@
             a.remark,
             p.project_code AS projectCode,
             p.name         AS projectName,
-            GROUP_CONCAT(DISTINCT CONCAT(rp2.emp_no, '-', rp2.name) SEPARATOR '，') AS awardPersons
+            GROUP_CONCAT(DISTINCT CONCAT(u2.emp_no, '-', u2.real_name) SEPARATOR '，') AS awardPersons
         FROM research_award a
                  LEFT JOIN research_project p ON p.id = a.project_id
                  LEFT JOIN research_project_member pm ON pm.project_id = a.project_id
-                 LEFT JOIN research_person rp ON rp.id = pm.person_id
+                 LEFT JOIN sys_user u ON u.id = pm.person_id
                  LEFT JOIN research_project_member pm2 ON pm2.project_id = a.project_id
-                 LEFT JOIN research_person rp2 ON rp2.id = pm2.person_id
-        WHERE rp.id = #{personId}
+                 LEFT JOIN sys_user u2 ON u2.id = pm2.person_id
+        WHERE u.id = #{personId}
         GROUP BY a.id
         ORDER BY a.id ASC
     </select>

@@ -1,12 +1,13 @@
 package edu.jjxy.researchmanagementsystem.service.impl;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.entity.Person;
+import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.mapper.PersonMapper;
+import edu.jjxy.researchmanagementsystem.mapper.UserMapper;
 import edu.jjxy.researchmanagementsystem.service.PersonService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import java.util.List;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class PersonServiceImpl implements PersonService {
 
     private final PersonMapper personMapper;
+    private final UserMapper userMapper;
 
-    public PersonServiceImpl(PersonMapper personMapper) {
+    public PersonServiceImpl(PersonMapper personMapper, UserMapper userMapper) {
         this.personMapper = personMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -30,18 +33,45 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Long add(Person p) {
-        personMapper.insert(p);
-        return p.getId();
+        User u = new User();
+        u.setUsername(p.getEmpNo());
+        u.setRealName(p.getName());
+        u.setEmpNo(p.getEmpNo());
+        u.setGender(p.getGender());
+        u.setTitle(p.getTitle());
+        u.setDepartment(p.getDepartment());
+        u.setPhone(p.getPhone());
+        u.setEmail(p.getEmail());
+        u.setHireDate(p.getHireDate());
+        u.setRemark(p.getRemark());
+        u.setRole("USER");
+        u.setPasswordHash(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        u.setStatus(1);
+        userMapper.insert(u);
+        return u.getId();
     }
 
     @Override
     public void update(Person p) {
-        personMapper.update(p);
+        User u = userMapper.selectById(p.getId());
+        if (u == null) {
+            return;
+        }
+        u.setRealName(p.getName());
+        u.setEmpNo(p.getEmpNo());
+        u.setGender(p.getGender());
+        u.setTitle(p.getTitle());
+        u.setDepartment(p.getDepartment());
+        u.setPhone(p.getPhone());
+        u.setEmail(p.getEmail());
+        u.setHireDate(p.getHireDate());
+        u.setRemark(p.getRemark());
+        userMapper.update(u);
     }
 
     @Override
     public void delete(Long id) {
-        personMapper.deleteById(id);
+        userMapper.deleteById(id);
     }
 
     @Override

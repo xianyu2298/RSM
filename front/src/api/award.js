@@ -7,3 +7,7 @@ export const awardDelete = (id) => http.delete(`/api/award/${id}`)
 export const awardGet = (id) => http.get(`/api/award/${id}`)
 export const awardListByPersonId = (personId) =>
     http.get('/api/award/listByPersonId', { params: { personId } })
+export const awardBindProject = (params) =>
+    http.post('/api/award/bind', null, { params })
+export const awardUnbindProject = (params) =>
+    http.post('/api/award/unbind', null, { params })

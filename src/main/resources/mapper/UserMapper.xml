@@ -4,29 +4,85 @@
 <mapper namespace="edu.jjxy.researchmanagementsystem.mapper.UserMapper">
 
     <select id="page" resultType="edu.jjxy.researchmanagementsystem.entity.User">
-        SELECT id, username, password_hash, real_name, role, status, created_at, updated_at
+        SELECT id,
+               username,
+               password_hash,
+               real_name,
+               emp_no      AS empNo,
+               gender,
+               title,
+               department,
+               phone,
+               email,
+               hire_date   AS hireDate,
+               remark,
+               role,
+               status,
+               created_at,
+               updated_at
         FROM sys_user
         <where>
             <if test="username != null and username != ''">
                 AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="realName != null and realName != ''">
+                AND real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
             </if>
         </where>
         ORDER BY id ASC
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.User">
-        SELECT id, username, password_hash, real_name, role, status, created_at, updated_at
-        FROM sys_user WHERE id = #{id}
+        SELECT id,
+               username,
+               password_hash,
+               real_name,
+               emp_no      AS empNo,
+               gender,
+               title,
+               department,
+               phone,
+               email,
+               hire_date   AS hireDate,
+               remark,
+               role,
+               status,
+               created_at,
+               updated_at
+        FROM sys_user
+        WHERE id = #{id}
     </select>
 
     <select id="selectByUsername" resultType="edu.jjxy.researchmanagementsystem.entity.User">
-        SELECT id, username, password_hash, real_name, role, status, created_at, updated_at
-        FROM sys_user WHERE username = #{username}
+        SELECT id,
+               username,
+               password_hash,
+               real_name,
+               emp_no      AS empNo,
+               gender,
+               title,
+               department,
+               phone,
+               email,
+               hire_date   AS hireDate,
+               remark,
+               role,
+               status,
+               created_at,
+               updated_at
+        FROM sys_user
+        WHERE username = #{username}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO sys_user(username, password_hash, real_name, role, status, created_at)
-        VALUES (#{username}, #{passwordHash}, #{realName}, #{role}, #{status}, NOW())
+        INSERT INTO sys_user(username, password_hash, real_name, emp_no, gender, title, department, phone, email, hire_date, remark, role, status, created_at)
+        VALUES (#{username}, #{passwordHash}, #{realName}, #{empNo}, #{gender}, #{title}, #{department}, #{phone}, #{email}, #{hireDate}, #{remark}, #{role}, #{status}, NOW())
     </insert>
 
     <update id="updateStatus">
@@ -42,10 +98,22 @@
     <update id="update">
         UPDATE sys_user
         SET real_name = #{realName},
-            role = #{role},
-            status = #{status},
-            updated_at = NOW()
+            emp_no      = #{empNo},
+            gender      = #{gender},
+            title       = #{title},
+            department  = #{department},
+            phone       = #{phone},
+            email       = #{email},
+            hire_date   = #{hireDate},
+            remark      = #{remark},
+            role        = #{role},
+            status      = #{status},
+            updated_at  = NOW()
         WHERE id = #{id}
     </update>
+
+    <delete id="deleteById">
+        DELETE FROM sys_user WHERE id = #{id}
+    </delete>
 
 </mapper>
