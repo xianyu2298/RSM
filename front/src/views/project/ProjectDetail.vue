@@ -12,7 +12,7 @@
         <el-descriptions-item label="项目编号">{{ project.projectCode }}</el-descriptions-item>
         <el-descriptions-item label="项目名称">{{ project.name }}</el-descriptions-item>
         <el-descriptions-item label="项目状态">
-          <template v-if="isAdmin">
+          <template v-if="isAdmin || isLeader">
             <el-select v-model="project.statusCode" style="width:160px" @change="updateStatus">
               <el-option
                   v-for="i in dictMap['PROJECT_STATUS'] || []"
@@ -42,14 +42,14 @@
       <el-tabs v-model="active">
         <!-- 成员 -->
         <el-tab-pane label="成员" name="member">
-          <el-button v-if="isAdmin" type="success" @click="openAddMember">绑定成员</el-button>
+          <el-button v-if="isAdmin || isLeader" type="success" @click="openAddMember">绑定成员</el-button>
           <el-table :data="members" border style="margin-top:10px">
             <el-table-column prop="empNo" label="工号" width="120" />
             <el-table-column prop="personName" label="姓名" width="120" />
             <el-table-column prop="duty" label="职责" width="140"/>
             <el-table-column prop="joinDate" label="加入日期" width="140"/>
             <el-table-column prop="remark" label="备注"/>
-            <el-table-column v-if="isAdmin" label="操作" width="120">
+            <el-table-column v-if="isAdmin || isLeader" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="移除该成员？" @confirm="delMember(row.id)">
                   <template #reference>
@@ -85,7 +85,7 @@
 
         <!-- 论文 -->
         <el-tab-pane label="论文" name="paper">
-          <el-button v-if="isAdmin" type="success" @click="openBindPaper">绑定论文</el-button>
+          <el-button v-if="isAdmin || isCurrentUserMember" type="success" @click="openBindPaper">绑定论文</el-button>
 
           <el-table :data="projectPapers" border style="margin-top:10px">
             <el-table-column prop="id" label="关联ID" width="90"/>
@@ -95,7 +95,7 @@
             <el-table-column prop="indexCode" label="检索源" width="120"/>
             <el-table-column prop="publishDate" label="发表日期" width="140"/>
             <el-table-column prop="doi" label="DOI" width="180"/>
-            <el-table-column v-if="isAdmin" label="操作" width="120">
+            <el-table-column v-if="isAdmin || isCurrentUserMember" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="解绑该论文？" @confirm="unbindPaper(row.id)">
                   <template #reference>
@@ -109,7 +109,7 @@
 
 
         <el-tab-pane label="著作" name="book">
-          <el-button v-if="isAdmin" type="success" @click="openBindBook">绑定著作</el-button>
+          <el-button v-if="isAdmin || isCurrentUserMember" type="success" @click="openBindBook">绑定著作</el-button>
 
           <el-table :data="projectBooks" border style="margin-top:10px">
             <el-table-column prop="id" label="关联ID" width="90"/>
@@ -118,7 +118,7 @@
             <el-table-column prop="publisher" label="出版社" width="200"/>
             <el-table-column prop="publishDate" label="出版日期" width="140"/>
             <el-table-column prop="isbn" label="ISBN" width="180"/>
-            <el-table-column v-if="isAdmin" label="操作" width="120">
+            <el-table-column v-if="isAdmin || isCurrentUserMember" label="操作" width="120">
               <template #default="{ row }">
                 <el-popconfirm title="解绑该著作？" @confirm="unbindBook(row.id)">
                   <template #reference>
@@ -155,7 +155,10 @@
         </el-form-item>
 
         <el-form-item label="职责">
-          <el-input v-model="memberDlg.form.duty" placeholder="负责人/成员"/>
+          <el-select v-model="memberDlg.form.duty" placeholder="请选择职责" style="width:100%">
+            <el-option label="负责人" value="负责人" />
+            <el-option label="成员" value="成员" />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="加入日期">
@@ -279,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -313,7 +316,17 @@ const projectBooks = ref([])
 
 const active = ref('member')
 
-// 字典缓存
+const isLeader = computed(() => {
+  if (!currentUser || !currentUser.id) return false
+  if (!project.value || !project.value.leaderPersonId) return false
+  return project.value.leaderPersonId === currentUser.id
+})
+
+const isCurrentUserMember = computed(() => {
+  if (!currentUser || !currentUser.id) return false
+  return members.value.some(m => m.personId === currentUser.id)
+})
+
 const dictMap = reactive({})
 
 function dictName(typeCode, itemCode) {
@@ -443,14 +456,17 @@ async function openBindPaper() {
   await searchPaperLibrary()
 }
 
-/** 查询论文库（用你现有 paperPage） */
 async function searchPaperLibrary() {
-  const res = await paperPage({
+  const params = {
     page: paperBindDlg.page,
     size: paperBindDlg.size,
     title: paperBindDlg.keyword || undefined,
     indexCode: paperBindDlg.indexCode || undefined
-  })
+  }
+  if (!isAdmin && currentUser && currentUser.id) {
+    params.personId = currentUser.id
+  }
+  const res = await paperPage(params)
   paperBindDlg.list = res.records || []
   paperBindDlg.total = res.total || 0
 }
@@ -478,13 +494,16 @@ async function openBindBook() {
   await searchBookLibrary()
 }
 
-/** 查询著作库（用你现有 bookPage） */
 async function searchBookLibrary() {
-  const res = await bookPage({
+  const params = {
     page: bookBindDlg.page,
     size: bookBindDlg.size,
     name: bookBindDlg.keyword || undefined
-  })
+  }
+  if (!isAdmin && currentUser && currentUser.id) {
+    params.personId = currentUser.id
+  }
+  const res = await bookPage(params)
   bookBindDlg.list = res.records || []
   bookBindDlg.total = res.total || 0
 }

@@ -29,5 +29,21 @@
         ORDER BY pp.id ASC
     </select>
 
+    <select id="selectById"
+            resultType="edu.jjxy.researchmanagementsystem.entity.ProjectPaper">
+        SELECT
+            pp.id,
+            pp.project_id,
+            pp.paper_id,
+            p.title,
+            p.journal,
+            p.index_code AS indexCode,
+            p.publish_date AS publishDate,
+            p.doi
+        FROM research_project_paper pp
+                 LEFT JOIN research_paper p ON p.id = pp.paper_id
+        WHERE pp.id = #{id}
+    </select>
+
 </mapper>
 

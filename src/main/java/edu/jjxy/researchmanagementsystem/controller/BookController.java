@@ -29,7 +29,14 @@ public class BookController {
         return Result.ok(service.page(page, size, name, effectivePersonId));
     }
 
-    @PostMapping public Result<Long> add(@RequestBody Book b){ return Result.ok(service.add(b)); }
+    @PostMapping
+    public Result<Long> add(@RequestBody Book b, HttpServletRequest request){
+        User current = (User) request.getAttribute("currentUser");
+        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
+            b.setPersonId(current.getId());
+        }
+        return Result.ok(service.add(b));
+    }
     @PutMapping public Result<Void> update(@RequestBody Book b){ service.update(b); return Result.ok(null); }
     @DeleteMapping("/{id}") public Result<Void> delete(@PathVariable Long id){ service.delete(id); return Result.ok(null); }
     @GetMapping("/{id}") public Result<Book> get(@PathVariable Long id){ return Result.ok(service.get(id)); }

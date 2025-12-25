@@ -69,6 +69,16 @@ public class AuthInterceptor implements HandlerInterceptor {
             if ("PUT".equalsIgnoreCase(method) && "/api/user/password".equals(path)) {
                 return true;
             }
+            if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)) {
+                if (path.startsWith("/api/paper")
+                        || path.startsWith("/api/book")
+                        || path.startsWith("/api/project")
+                        || path.startsWith("/api/project-member")
+                        || path.startsWith("/api/project-paper")
+                        || path.startsWith("/api/project-book")) {
+                    return true;
+                }
+            }
             writeError(response, 403, "无权限执行该操作");
             return false;
         }

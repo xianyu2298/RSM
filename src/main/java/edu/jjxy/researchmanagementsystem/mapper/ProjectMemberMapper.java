@@ -12,4 +12,8 @@ public interface ProjectMemberMapper {
     int deleteById(@Param("id") Long id);
 
     List<ProjectMember> listByProjectId(@Param("projectId") Long projectId);
+
+    int countByProjectIdAndPersonId(@Param("projectId") Long projectId, @Param("personId") Long personId);
+
+    ProjectMember selectById(@Param("id") Long id);
 }

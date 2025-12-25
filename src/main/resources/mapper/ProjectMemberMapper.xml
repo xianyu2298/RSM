@@ -28,5 +28,26 @@
         ORDER BY m.id ASC
     </select>
 
+    <select id="countByProjectIdAndPersonId" resultType="int">
+        SELECT COUNT(1)
+        FROM research_project_member
+        WHERE project_id = #{projectId}
+          AND person_id = #{personId}
+    </select>
+
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.ProjectMember">
+        SELECT
+            m.id,
+            m.project_id,
+            m.person_id,
+            m.duty,
+            m.join_date,
+            m.remark,
+            u.emp_no    AS empNo,
+            u.real_name AS personName
+        FROM research_project_member m
+                 LEFT JOIN sys_user u ON u.id = m.person_id
+        WHERE m.id = #{id}
+    </select>
 
 </mapper>

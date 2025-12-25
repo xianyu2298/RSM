@@ -11,7 +11,7 @@
 
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
-      <el-button v-if="isAdmin" type="success" @click="openAdd">新增项目</el-button>
+      <el-button type="success" @click="openAdd">新增项目</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
@@ -85,23 +85,28 @@
         />
       </el-form-item>
       <el-form-item label="负责人">
-        <el-select
-            v-model="form.leaderPersonId"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="输入姓名或工号搜索负责人"
-            :remote-method="remoteSearchLeader"
-            :loading="leaderLoading"
-            style="width:100%"
-        >
-          <el-option
-              v-for="p in leaderOptions"
-              :key="p.id"
-              :label="`${p.empNo} - ${p.name}`"
-              :value="p.id"
-          />
-        </el-select>
+        <template v-if="isAdmin">
+          <el-select
+              v-model="form.leaderPersonId"
+              filterable
+              remote
+              reserve-keyword
+              placeholder="输入姓名或工号搜索负责人"
+              :remote-method="remoteSearchLeader"
+              :loading="leaderLoading"
+              style="width:100%"
+          >
+            <el-option
+                v-for="p in leaderOptions"
+                :key="p.id"
+                :label="`${p.empNo} - ${p.name}`"
+                :value="p.id"
+            />
+          </el-select>
+        </template>
+        <template v-else>
+          <div>{{ currentUser.empNo }} - {{ currentUser.realName }}</div>
+        </template>
       </el-form-item>
       <el-form-item label="预算">
         <el-input-number v-model="form.budget" :min="0" :step="1000" />
@@ -197,7 +202,7 @@ function openAdd() {
     id: null, projectCode: '', name: '',
     natureCode: '', scopeCode: '',
     startDate: '', endDate: '',
-    leaderPersonId: null, budget: null, remark: ''
+    leaderPersonId: isAdmin ? null : currentUser.id, budget: null, remark: ''
   })
   dateRange.value = []
 }

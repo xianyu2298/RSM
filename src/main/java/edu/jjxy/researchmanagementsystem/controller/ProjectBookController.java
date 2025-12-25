@@ -2,9 +2,11 @@ package edu.jjxy.researchmanagementsystem.controller;
 
 import edu.jjxy.researchmanagementsystem.common.Result;
 import edu.jjxy.researchmanagementsystem.entity.ProjectBook;
+import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.service.ProjectBookService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +26,14 @@ public class ProjectBookController {
     }
 
     @PostMapping("/bind")
-    public Result<Void> bind(@RequestBody Map<String, Long> body) {
-        service.bind(body.get("projectId"), body.get("bookId"));
+    public Result<Void> bind(@RequestBody Map<String, Long> body, HttpServletRequest request) {
+        service.bind(body.get("projectId"), body.get("bookId"), (User) request.getAttribute("currentUser"));
         return Result.ok(null);
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> unbind(@PathVariable Long id) {
-        service.unbind(id);
+    public Result<Void> unbind(@PathVariable Long id, HttpServletRequest request) {
+        service.unbind(id, (User) request.getAttribute("currentUser"));
         return Result.ok(null);
     }
 }

@@ -8,7 +8,7 @@
 
       <el-button type="primary" @click="load">查询</el-button>
       <el-button @click="reset">重置</el-button>
-      <el-button v-if="isAdmin" type="success" @click="openAdd">新增论文</el-button>
+      <el-button type="success" @click="openAdd">新增论文</el-button>
     </div>
 
     <el-table :data="rows" style="margin-top:12px" border>
@@ -51,23 +51,28 @@
   <el-dialog v-model="dlg.visible" :title="dlg.title" width="720px">
     <el-form :model="form" label-width="90px">
       <el-form-item label="作者">
-        <el-select
-            v-model="form.personId"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="输入姓名或工号搜索作者"
-            :remote-method="remoteSearchPerson"
-            :loading="personLoading"
-            style="width:100%"
-        >
-          <el-option
-              v-for="p in personOptions"
-              :key="p.id"
-              :label="`${p.empNo} - ${p.name}`"
-              :value="p.id"
-          />
-        </el-select>
+        <template v-if="isAdmin">
+          <el-select
+              v-model="form.personId"
+              filterable
+              remote
+              reserve-keyword
+              placeholder="输入姓名或工号搜索作者"
+              :remote-method="remoteSearchPerson"
+              :loading="personLoading"
+              style="width:100%"
+          >
+            <el-option
+                v-for="p in personOptions"
+                :key="p.id"
+                :label="`${p.empNo} - ${p.name}`"
+                :value="p.id"
+            />
+          </el-select>
+        </template>
+        <template v-else>
+          <div>{{ currentUser.empNo }} - {{ currentUser.realName }}</div>
+        </template>
       </el-form-item>
 
       <el-form-item label="论文标题">
@@ -167,7 +172,7 @@ function openAdd() {
   personOptions.value = []
   Object.assign(form, {
     id: null,
-    personId: null,
+    personId: isAdmin ? null : currentUser.id,
     title: '',
     journal: '',
     indexCode: '',

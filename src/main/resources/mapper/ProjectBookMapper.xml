@@ -27,4 +27,18 @@
         ORDER BY pb.id ASC
     </select>
 
+    <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.ProjectBook">
+        SELECT
+            pb.id,
+            pb.project_id,
+            pb.book_id,
+            b.name         AS bookName,
+            b.publisher    AS publisher,
+            b.publish_date AS publishDate,
+            b.isbn         AS isbn
+        FROM research_project_book pb
+                 LEFT JOIN research_book b ON b.id = pb.book_id
+        WHERE pb.id = #{id}
+    </select>
+
 </mapper>

@@ -30,7 +30,14 @@ public class PaperController {
         return Result.ok(service.page(page, size, title, effectivePersonId, indexCode));
     }
 
-    @PostMapping public Result<Long> add(@RequestBody Paper p){ return Result.ok(service.add(p)); }
+    @PostMapping
+    public Result<Long> add(@RequestBody Paper p, HttpServletRequest request){
+        User current = (User) request.getAttribute("currentUser");
+        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
+            p.setPersonId(current.getId());
+        }
+        return Result.ok(service.add(p));
+    }
     @PutMapping public Result<Void> update(@RequestBody Paper p){ service.update(p); return Result.ok(null); }
     @DeleteMapping("/{id}") public Result<Void> delete(@PathVariable Long id){ service.delete(id); return Result.ok(null); }
     @GetMapping("/{id}") public Result<Paper> get(@PathVariable Long id){ return Result.ok(service.get(id)); }

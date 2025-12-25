@@ -61,7 +61,24 @@ public class ProjectController {
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody Project p) {
+    public Result<Void> update(@RequestBody Project p, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
+            Project db = projectService.get(p.getId());
+            if (db == null) {
+                return Result.fail("项目不存在");
+            }
+            String newStatus = p.getStatusCode();
+            String oldStatus = db.getStatusCode();
+            boolean statusChanged = (newStatus != null && !newStatus.equals(oldStatus))
+                    || (newStatus == null && oldStatus != null);
+            if (statusChanged) {
+                Long leaderId = db.getLeaderPersonId();
+                if (leaderId == null || !leaderId.equals(current.getId())) {
+                    return Result.fail("无权限：只有负责人可以修改项目状态");
+                }
+            }
+        }
         projectService.update(p);
         return Result.ok(null);
     }

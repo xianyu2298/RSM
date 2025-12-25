@@ -8,5 +8,6 @@ public interface ProjectBookMapper {
     int insert(@Param("projectId") Long projectId, @Param("bookId") Long bookId);
     int deleteById(@Param("id") Long id);
     List<ProjectBook> listByProjectId(@Param("projectId") Long projectId);
+    ProjectBook selectById(@Param("id") Long id);
 }
 

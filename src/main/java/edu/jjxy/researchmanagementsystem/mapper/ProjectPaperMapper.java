@@ -8,5 +8,6 @@ public interface ProjectPaperMapper {
     int insert(@Param("projectId") Long projectId, @Param("paperId") Long paperId);
     int deleteById(@Param("id") Long id);
     List<ProjectPaper> listByProjectId(@Param("projectId") Long projectId);
+    ProjectPaper selectById(@Param("id") Long id);
 }
 
