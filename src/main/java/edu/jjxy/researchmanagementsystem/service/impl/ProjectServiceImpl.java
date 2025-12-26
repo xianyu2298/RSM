@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.entity.Project;
+import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.mapper.ProjectMapper;
 import edu.jjxy.researchmanagementsystem.service.ProjectService;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,30 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void update(Project p) {
+    public void update(Project p, User currentUser) {
+        if (currentUser != null && "USER".equalsIgnoreCase(currentUser.getRole())) {
+            Project db = projectMapper.selectById(p.getId());
+            if (db == null) {
+                throw new RuntimeException("项目不存在");
+            }
+            if (db.getLeaderPersonId() == null || !db.getLeaderPersonId().equals(currentUser.getId())) {
+                throw new RuntimeException("无权限：只有负责人可以修改项目");
+            }
+        }
         projectMapper.update(p);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, User currentUser) {
+        if (currentUser != null && "USER".equalsIgnoreCase(currentUser.getRole())) {
+            Project db = projectMapper.selectById(id);
+            if (db == null) {
+                throw new RuntimeException("项目不存在");
+            }
+            if (db.getLeaderPersonId() == null || !db.getLeaderPersonId().equals(currentUser.getId())) {
+                throw new RuntimeException("无权限：只有负责人可以删除项目");
+            }
+        }
         projectMapper.deleteById(id);
     }
 

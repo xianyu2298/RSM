@@ -21,8 +21,8 @@
       <el-table-column prop="remark" label="备注" min-width="200" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
-          <el-button v-if="isAdmin" size="small" @click="openEdit(row)">编辑</el-button>
-          <el-popconfirm v-if="isAdmin" title="确定删除？" @confirm="remove(row.id)">
+          <el-button v-if="isAdmin || row.personId === currentUser.id" size="small" @click="openEdit(row)">编辑</el-button>
+          <el-popconfirm v-if="isAdmin || row.personId === currentUser.id" title="确定删除？" @confirm="remove(row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
             </template>

@@ -37,7 +37,18 @@ public class BookController {
         }
         return Result.ok(service.add(b));
     }
-    @PutMapping public Result<Void> update(@RequestBody Book b){ service.update(b); return Result.ok(null); }
-    @DeleteMapping("/{id}") public Result<Void> delete(@PathVariable Long id){ service.delete(id); return Result.ok(null); }
+    @PutMapping
+    public Result<Void> update(@RequestBody Book b, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        service.update(b, current);
+        return Result.ok(null);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        service.delete(id, current);
+        return Result.ok(null);
+    }
     @GetMapping("/{id}") public Result<Book> get(@PathVariable Long id){ return Result.ok(service.get(id)); }
 }

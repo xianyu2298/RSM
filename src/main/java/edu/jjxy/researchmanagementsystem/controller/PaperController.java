@@ -38,7 +38,18 @@ public class PaperController {
         }
         return Result.ok(service.add(p));
     }
-    @PutMapping public Result<Void> update(@RequestBody Paper p){ service.update(p); return Result.ok(null); }
-    @DeleteMapping("/{id}") public Result<Void> delete(@PathVariable Long id){ service.delete(id); return Result.ok(null); }
+    @PutMapping
+    public Result<Void> update(@RequestBody Paper p, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        service.update(p, current);
+        return Result.ok(null);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        service.delete(id, current);
+        return Result.ok(null);
+    }
     @GetMapping("/{id}") public Result<Paper> get(@PathVariable Long id){ return Result.ok(service.get(id)); }
 }

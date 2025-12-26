@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.entity.Paper;
+import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.mapper.PaperMapper;
 import edu.jjxy.researchmanagementsystem.service.PaperService;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,32 @@ public class PaperServiceImpl implements PaperService {
         return new PageResult<>(info.getTotal(), info.getList());
     }
     @Override public Long add(Paper p){ mapper.insert(p); return p.getId(); }
-    @Override public void update(Paper p){ mapper.update(p); }
-    @Override public void delete(Long id){ mapper.deleteById(id); }
+    @Override
+    public void update(Paper p, User currentUser) {
+        if (currentUser != null && "USER".equalsIgnoreCase(currentUser.getRole())) {
+            Paper db = mapper.selectById(p.getId());
+            if (db == null) {
+                throw new RuntimeException("论文不存在");
+            }
+            if (db.getPersonId() == null || !db.getPersonId().equals(currentUser.getId())) {
+                throw new RuntimeException("无权限：只能修改本人发表的论文");
+            }
+        }
+        mapper.update(p);
+    }
+
+    @Override
+    public void delete(Long id, User currentUser) {
+        if (currentUser != null && "USER".equalsIgnoreCase(currentUser.getRole())) {
+            Paper db = mapper.selectById(id);
+            if (db == null) {
+                throw new RuntimeException("论文不存在");
+            }
+            if (db.getPersonId() == null || !db.getPersonId().equals(currentUser.getId())) {
+                throw new RuntimeException("无权限：只能删除本人发表的论文");
+            }
+        }
+        mapper.deleteById(id);
+    }
     @Override public Paper get(Long id){ return mapper.selectById(id); }
 }
