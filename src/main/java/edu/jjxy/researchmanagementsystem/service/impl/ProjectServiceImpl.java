@@ -4,20 +4,26 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import edu.jjxy.researchmanagementsystem.common.PageResult;
 import edu.jjxy.researchmanagementsystem.entity.Project;
+import edu.jjxy.researchmanagementsystem.entity.ProjectMember;
 import edu.jjxy.researchmanagementsystem.entity.User;
 import edu.jjxy.researchmanagementsystem.mapper.ProjectMapper;
+import edu.jjxy.researchmanagementsystem.mapper.ProjectMemberMapper;
 import edu.jjxy.researchmanagementsystem.service.ProjectService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
+    private final ProjectMemberMapper projectMemberMapper;
 
-    public ProjectServiceImpl(ProjectMapper projectMapper) {
+    public ProjectServiceImpl(ProjectMapper projectMapper, ProjectMemberMapper projectMemberMapper) {
         this.projectMapper = projectMapper;
+        this.projectMemberMapper = projectMemberMapper;
     }
 
     @Override
@@ -28,8 +34,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public Long add(Project p) {
         projectMapper.insert(p);
+        if (p.getLeaderPersonId() != null) {
+            ProjectMember pm = new ProjectMember();
+            pm.setProjectId(p.getId());
+            pm.setPersonId(p.getLeaderPersonId());
+            pm.setDuty("负责人");
+            pm.setJoinDate(p.getStartDate() != null ? p.getStartDate() : LocalDate.now());
+            pm.setRemark("创建项目自动绑定");
+            projectMemberMapper.insert(pm);
+        }
         return p.getId();
     }
 

@@ -28,30 +28,6 @@ public class ProjectController {
                                             @RequestParam(required = false) String natureCode,
                                             @RequestParam(required = false) String scopeCode,
                                             HttpServletRequest request) {
-        User current = (User) request.getAttribute("currentUser");
-        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
-            List<Project> all = projectService.listByPersonId(current.getId());
-            List<Project> filtered = new ArrayList<>();
-            for (Project p : all) {
-                if (name != null && !name.isEmpty() && (p.getName() == null || !p.getName().contains(name))) {
-                    continue;
-                }
-                if (natureCode != null && !natureCode.isEmpty() && (p.getNatureCode() == null || !p.getNatureCode().equals(natureCode))) {
-                    continue;
-                }
-                if (scopeCode != null && !scopeCode.isEmpty() && (p.getScopeCode() == null || !p.getScopeCode().equals(scopeCode))) {
-                    continue;
-                }
-                filtered.add(p);
-            }
-            int fromIndex = (page - 1) * size;
-            if (fromIndex < 0) {
-                fromIndex = 0;
-            }
-            int toIndex = Math.min(fromIndex + size, filtered.size());
-            List<Project> pageList = fromIndex >= filtered.size() ? new ArrayList<>() : filtered.subList(fromIndex, toIndex);
-            return Result.ok(new PageResult<>((long) filtered.size(), pageList));
-        }
         return Result.ok(projectService.page(page, size, name, natureCode, scopeCode));
     }
 

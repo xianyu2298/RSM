@@ -60,4 +60,9 @@ public class UserServiceImpl implements UserService {
         mapper.updatePassword(userId,
                 DigestUtils.md5DigestAsHex(newPwd.getBytes()));
     }
+
+    @Override
+    public void delete(Long id) {
+        mapper.deleteById(id);
+    }
 }

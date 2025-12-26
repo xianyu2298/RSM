@@ -22,12 +22,7 @@ public class PaperController {
                                           @RequestParam(required=false) Long personId,
                                           @RequestParam(required=false) String indexCode,
                                           HttpServletRequest request){
-        User current = (User) request.getAttribute("currentUser");
-        Long effectivePersonId = personId;
-        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
-            effectivePersonId = current.getId();
-        }
-        return Result.ok(service.page(page, size, title, effectivePersonId, indexCode));
+        return Result.ok(service.page(page, size, title, personId, indexCode));
     }
 
     @PostMapping

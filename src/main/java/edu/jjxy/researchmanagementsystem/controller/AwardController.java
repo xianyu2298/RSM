@@ -23,27 +23,6 @@ public class AwardController {
                                           @RequestParam(required=false) String awardName,
                                           @RequestParam(required=false) Long projectId,
                                           HttpServletRequest request){
-        User current = (User) request.getAttribute("currentUser");
-        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
-            List<Award> all = service.listByPersonId(current.getId());
-            List<Award> filtered = new ArrayList<>();
-            for (Award a : all) {
-                if (awardName != null && !awardName.isEmpty() && (a.getAwardName() == null || !a.getAwardName().contains(awardName))) {
-                    continue;
-                }
-                if (projectId != null && (a.getProjectId() == null || !a.getProjectId().equals(projectId))) {
-                    continue;
-                }
-                filtered.add(a);
-            }
-            int fromIndex = (page - 1) * size;
-            if (fromIndex < 0) {
-                fromIndex = 0;
-            }
-            int toIndex = Math.min(fromIndex + size, filtered.size());
-            List<Award> pageList = fromIndex >= filtered.size() ? new ArrayList<>() : filtered.subList(fromIndex, toIndex);
-            return Result.ok(new PageResult<>((long) filtered.size(), pageList));
-        }
         return Result.ok(service.page(page, size, awardName, projectId));
     }
 

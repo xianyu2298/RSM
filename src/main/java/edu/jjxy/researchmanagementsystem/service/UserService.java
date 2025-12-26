@@ -10,4 +10,5 @@ public interface UserService {
     void enable(Long id, Integer status);
     void changePassword(Long userId, String oldPwd, String newPwd);
     void resetPassword(Long userId, String newPwd);
+    void delete(Long id);
 }

@@ -426,7 +426,7 @@ const awardBindDlg = reactive({
   total: 0,
   list: []
 })
-// ===================== 论文 / 著作：绑定弹窗状态 =====================
+
 
 // 论文绑定弹窗
 const paperBindDlg = reactive({

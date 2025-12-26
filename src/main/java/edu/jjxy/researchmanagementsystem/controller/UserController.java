@@ -77,4 +77,14 @@ public class UserController {
         service.resetPassword(userId, newPwd);
         return Result.ok(null);
     }
+
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
+        User current = (User) request.getAttribute("currentUser");
+        if (current == null || !"ADMIN".equalsIgnoreCase(current.getRole())) {
+            throw new RuntimeException("无权限");
+        }
+        service.delete(id);
+        return Result.ok(null);
+    }
 }

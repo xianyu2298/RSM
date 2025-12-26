@@ -31,13 +31,19 @@
       <el-table-column prop="endDate" label="结束" width="120" />
       <el-table-column label="操作" width="220">
         <template #default="{ row }">
-          <el-button v-if="isAdmin || row.leaderPersonId === currentUser.id" size="small" @click="openEdit(row)">编辑</el-button>
-          <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
-          <el-popconfirm v-if="isAdmin || row.leaderPersonId === currentUser.id" title="确定删除？" @confirm="remove(row.id)">
-            <template #reference>
-              <el-button size="small" type="danger">删除</el-button>
-            </template>
-          </el-popconfirm>
+          <div v-if="isAdmin || row.leaderPersonId === currentUser.id">
+            <el-button size="small" @click="openEdit(row)">编辑</el-button>
+            <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
+            <el-popconfirm title="确定删除？" @confirm="remove(row.id)">
+              <template #reference>
+                <el-button size="small" type="danger">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </div>
+          <div v-else>
+            <el-button size="small" type="primary" @click="goDetail(row.id)">详情</el-button>
+            <span style="color: #909399; font-size: 12px; margin-left: 8px;">无权限</span>
+          </div>
         </template>
       </el-table-column>
     </el-table>

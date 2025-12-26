@@ -21,12 +21,7 @@ public class BookController {
                                          @RequestParam(required=false) String name,
                                          @RequestParam(required=false) Long personId,
                                          HttpServletRequest request){
-        User current = (User) request.getAttribute("currentUser");
-        Long effectivePersonId = personId;
-        if (current != null && "USER".equalsIgnoreCase(current.getRole())) {
-            effectivePersonId = current.getId();
-        }
-        return Result.ok(service.page(page, size, name, effectivePersonId));
+        return Result.ok(service.page(page, size, name, personId));
     }
 
     @PostMapping
