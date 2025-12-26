@@ -34,7 +34,11 @@
         <el-descriptions-item label="结束日期">{{ project.endDate }}</el-descriptions-item>
         <el-descriptions-item label="预算">{{ project.budget }}</el-descriptions-item>
 
-        <el-descriptions-item label="备注" :span="3">{{ project.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item v-if="project.statusCode === 'AUDIT_REJECTED' || project.remark" label="审核/项目备注" :span="3">
+          <span :style="{ color: project.statusCode === 'AUDIT_REJECTED' ? 'red' : 'inherit' }">
+            {{ project.remark || '-' }}
+          </span>
+        </el-descriptions-item>
       </el-descriptions>
     </el-card>
 

@@ -17,6 +17,12 @@
             <if test="scopeCode != null and scopeCode != ''">
                 AND scope_code = #{scopeCode}
             </if>
+            <if test="statusCode != null and statusCode != ''">
+                AND status_code = #{statusCode}
+            </if>
+            <if test="leaderPersonId != null">
+                AND leader_person_id = #{leaderPersonId}
+            </if>
         </where>
         ORDER BY id ASC
     </select>

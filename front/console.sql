@@ -192,6 +192,8 @@ INSERT INTO sys_dict_item(type_code, item_code, item_name, sort_no) VALUES
 
 -- （可选）项目状态
 INSERT INTO sys_dict_item(type_code, item_code, item_name, sort_no) VALUES
+                                                                        ('PROJECT_STATUS','AUDIT_PENDING','待审核',0),
+                                                                        ('PROJECT_STATUS','AUDIT_REJECTED','未通过',99),
                                                                         ('PROJECT_STATUS','PLANNING','立项',1),
                                                                         ('PROJECT_STATUS','RUNNING','在研',2),
                                                                         ('PROJECT_STATUS','FINISHED','结题',3)

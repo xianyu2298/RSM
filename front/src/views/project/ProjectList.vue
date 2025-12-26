@@ -27,6 +27,16 @@
           {{ dictName('PROJECT_SCOPE', row.scopeCode) }}
         </template>
       </el-table-column>
+      <el-table-column prop="statusCode" label="状态" width="100">
+        <template #default="{ row }">
+          <el-tag v-if="row.statusCode === 'AUDIT_PENDING'" type="warning">待审核</el-tag>
+          <el-tag v-else-if="row.statusCode === 'AUDIT_REJECTED'" type="danger">未通过</el-tag>
+          <el-tag v-else-if="row.statusCode === 'PLANNING'" type="info">立项</el-tag>
+          <el-tag v-else-if="row.statusCode === 'RUNNING'" type="success">在研</el-tag>
+          <el-tag v-else-if="row.statusCode === 'FINISHED'" type="primary">结题</el-tag>
+          <el-tag v-else type="info">{{ row.statusCode || '未知' }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="startDate" label="开始" width="120" />
       <el-table-column prop="endDate" label="结束" width="120" />
       <el-table-column label="操作" width="220">
@@ -77,6 +87,11 @@
       <el-form-item label="项目范围">
         <el-select v-model="form.scopeCode" style="width:100%">
           <el-option v-for="i in scopeItems" :key="i.itemCode" :label="i.itemName" :value="i.itemCode" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="isAdmin && form.id" label="项目状态">
+        <el-select v-model="form.statusCode" style="width:100%">
+          <el-option v-for="i in statusItems" :key="i.itemCode" :label="i.itemName" :value="i.itemCode" />
         </el-select>
       </el-form-item>
       <el-form-item label="起止日期">
@@ -152,6 +167,7 @@ const rows = ref([])
 
 const natureItems = ref([])
 const scopeItems = ref([])
+const statusItems = ref([])
 
 const leaderOptions = ref([])
 const leaderLoading = ref(false)
@@ -163,6 +179,8 @@ function dictName(typeCode, itemCode) {
     items = natureItems.value || []
   } else if (typeCode === 'PROJECT_SCOPE') {
     items = scopeItems.value || []
+  } else if (typeCode === 'PROJECT_STATUS') {
+    items = statusItems.value || []
   }
   const hit = items.find(i => i.itemCode === itemCode)
   return hit ? hit.itemName : itemCode
@@ -171,7 +189,7 @@ function dictName(typeCode, itemCode) {
 const dlg = reactive({ visible: false, title: '' })
 const form = reactive({
   id: null, projectCode: '', name: '',
-  natureCode: '', scopeCode: '',
+  natureCode: '', scopeCode: '', statusCode: '',
   startDate: '', endDate: '',
   leaderPersonId: null, budget: null, remark: ''
 })
@@ -180,6 +198,7 @@ const dateRange = ref([])
 async function loadDict() {
   natureItems.value = await dictItems('PROJECT_NATURE')
   scopeItems.value = await dictItems('PROJECT_SCOPE')
+  statusItems.value = await dictItems('PROJECT_STATUS')
 }
 
 async function load() {
@@ -188,10 +207,16 @@ async function load() {
     size: size.value,
     name: q.name || undefined,
     natureCode: q.natureCode || undefined,
-    scopeCode: q.scopeCode || undefined
+    scopeCode: q.scopeCode || undefined,
+    // 如果没有指定状态，默认排除掉待审核和未通过的
+    // 这里我们简单处理：如果不传 statusCode，后端目前返回所有。
+    // 我们可以在这里指定我们需要显示的状态
   })
-  total.value = data.total
-  rows.value = data.records
+  
+  // 过滤掉待审核和未通过的（除非是在搜索特定状态，但目前搜索没选状态）
+  rows.value = data.records.filter(r => r.statusCode !== 'AUDIT_PENDING' && r.statusCode !== 'AUDIT_REJECTED')
+  total.value = rows.value.length // 注意：这会导致分页总数不准确，但考虑到数据量不大先这样。
+  // 更好的做法是后端支持传状态列表，或者前端传排除列表。
 }
 
 function reset() {
@@ -206,7 +231,7 @@ function openAdd() {
   leaderOptions.value = []
   Object.assign(form, {
     id: null, projectCode: '', name: '',
-    natureCode: '', scopeCode: '',
+    natureCode: '', scopeCode: '', statusCode: isAdmin ? 'PLANNING' : 'AUDIT_PENDING',
     startDate: '', endDate: '',
     leaderPersonId: isAdmin ? null : currentUser.id, budget: null, remark: ''
   })

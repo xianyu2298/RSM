@@ -27,10 +27,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PageResult<Project> page(int page, int size, String name, String natureCode, String scopeCode) {
+    public PageResult<Project> page(int page, int size, String name, String natureCode, String scopeCode, String statusCode, Long leaderPersonId) {
         PageHelper.startPage(page, size);
-        PageInfo<Project> info = new PageInfo<>(projectMapper.page(name, natureCode, scopeCode));
+        PageInfo<Project> info = new PageInfo<>(projectMapper.page(name, natureCode, scopeCode, statusCode, leaderPersonId));
         return new PageResult<>(info.getTotal(), info.getList());
+    }
+
+    @Override
+    public void audit(Long id, String statusCode, String remark) {
+        Project db = projectMapper.selectById(id);
+        if (db == null) {
+            throw new RuntimeException("项目不存在");
+        }
+        db.setStatusCode(statusCode);
+        db.setRemark(remark);
+        projectMapper.update(db);
     }
 
     @Override

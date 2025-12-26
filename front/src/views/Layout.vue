@@ -3,7 +3,12 @@
     <!-- 左侧菜单 -->
     <el-aside width="200px">
       <el-menu router :default-active="$route.path">
-        <el-menu-item index="/project">项目管理</el-menu-item>
+        <el-sub-menu index="project-group">
+          <template #title>项目管理</template>
+          <el-menu-item index="/project">全部项目</el-menu-item>
+          <el-menu-item v-if="!isAdmin" index="/project-audit">审核中的项目</el-menu-item>
+          <el-menu-item v-if="isAdmin" index="/project-review">项目审核</el-menu-item>
+        </el-sub-menu>
         <el-menu-item index="/person">人员管理</el-menu-item>
         <el-menu-item index="/paper">论文管理</el-menu-item>
         <el-menu-item index="/book">著作管理</el-menu-item>

@@ -7,11 +7,11 @@ import edu.jjxy.researchmanagementsystem.entity.User;
 import java.util.List;
 
 public interface ProjectService {
-    PageResult<Project> page(int page, int size, String name, String natureCode, String scopeCode);
+    PageResult<Project> page(int page, int size, String name, String natureCode, String scopeCode, String statusCode, Long leaderPersonId);
     Long add(Project p);
     void update(Project p, User currentUser);
     void delete(Long id, User currentUser);
     Project get(Long id);
     List<Project> listByPersonId(Long personId);
-
+    void audit(Long id, String statusCode, String remark);
 }

@@ -8,7 +8,9 @@ import java.util.List;
 public interface ProjectMapper {
     List<Project> page(@Param("name") String name,
                        @Param("natureCode") String natureCode,
-                       @Param("scopeCode") String scopeCode);
+                       @Param("scopeCode") String scopeCode,
+                       @Param("statusCode") String statusCode,
+                       @Param("leaderPersonId") Long leaderPersonId);
 
     int insert(Project p);
     int update(Project p);

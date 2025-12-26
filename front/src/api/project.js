@@ -7,3 +7,5 @@ export const projectDelete = (id) => http.delete(`/api/project/${id}`)
 export const projectGet = (id) => http.get(`/api/project/${id}`)
 export const projectListByPersonId = (personId) =>
     http.get('/api/project/listByPersonId', { params: { personId } })
+export const projectAudit = (id, statusCode, remark) =>
+    http.post('/api/project/audit', null, { params: { id, statusCode, remark } })

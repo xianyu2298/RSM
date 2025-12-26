@@ -20,7 +20,8 @@ const routes = [
         redirect: '/project',
         children: [
             { path: '/project', component: ProjectList },
-
+            { path: '/project-audit', component: () => import('../views/project/ProjectAuditList.vue') },
+            { path: '/project-review', component: () => import('../views/project/ProjectReviewList.vue') },
             { path: '/project/:id', component: ProjectDetail },
 
             { path: '/person', component: PersonList },
