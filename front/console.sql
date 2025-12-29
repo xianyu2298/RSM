@@ -130,9 +130,10 @@ CREATE TABLE research_paper (
                                 journal      VARCHAR(200),                    -- 刊物名称
                                 index_code   VARCHAR(50) NOT NULL,            -- 字典：PAPER_INDEX_SOURCE（EI/SCI/核心/一般）
                                 publish_date DATE,
-                                doi          VARCHAR(100),
-                                remark       VARCHAR(500),
-                                created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 doi          VARCHAR(100),
+                                 file_path    VARCHAR(500),                   -- 附件路径
+                                 remark       VARCHAR(500),
+                                 created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                 updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                 INDEX idx_paper_person (person_id),
                                 INDEX idx_paper_date (publish_date),
@@ -164,7 +165,8 @@ INSERT INTO sys_dict_type(type_code, type_name, sort_no) VALUES
                                                              ('PROJECT_NATURE', '项目性质', 1),
                                                              ('PROJECT_SCOPE', '项目范围', 2),
                                                              ('PAPER_INDEX_SOURCE', '论文检索源', 3),
-                                                             ('PROJECT_STATUS', '项目状态', 4)
+                                                             ('PAPER_JOURNAL', '期刊/会议', 4),
+                                                             ('PROJECT_STATUS', '项目状态', 5)
     ON DUPLICATE KEY UPDATE type_name=VALUES(type_name);
 
 -- 字典项：项目性质
@@ -188,6 +190,13 @@ INSERT INTO sys_dict_item(type_code, item_code, item_name, sort_no) VALUES
                                                                         ('PAPER_INDEX_SOURCE','SCI','SCI',2),
                                                                         ('PAPER_INDEX_SOURCE','CORE','核心期刊',3),
                                                                         ('PAPER_INDEX_SOURCE','NORMAL','一般期刊',4)
+    ON DUPLICATE KEY UPDATE item_name=VALUES(item_name), sort_no=VALUES(sort_no);
+
+-- 字典项：期刊/会议
+DELETE FROM sys_dict_item WHERE type_code = 'PAPER_JOURNAL';
+INSERT INTO sys_dict_item(type_code, item_code, item_name, sort_no) VALUES
+                                                                        ('PAPER_JOURNAL','JOURNAL','期刊',1),
+                                                                        ('PAPER_JOURNAL','CONFERENCE','会议',2)
     ON DUPLICATE KEY UPDATE item_name=VALUES(item_name), sort_no=VALUES(sort_no);
 
 -- （可选）项目状态

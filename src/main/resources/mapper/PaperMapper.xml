@@ -12,6 +12,7 @@
         p.index_code,
         p.publish_date,
         p.doi,
+        p.file_path   AS filePath,
         p.remark,
         u.emp_no      AS empNo,
         u.real_name   AS personName
@@ -49,19 +50,20 @@
     </select>
 
     <select id="selectById" resultType="edu.jjxy.researchmanagementsystem.entity.Paper">
-        SELECT id, person_id, title, journal, index_code, publish_date, doi, remark
+        SELECT id, person_id, title, journal, index_code, publish_date, doi, file_path AS filePath, remark
         FROM research_paper WHERE id = #{id}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO research_paper(person_id, title, journal, index_code, publish_date, doi, remark)
-        VALUES (#{personId}, #{title}, #{journal}, #{indexCode}, #{publishDate}, #{doi}, #{remark})
+        INSERT INTO research_paper(person_id, title, journal, index_code, publish_date, doi, file_path, remark)
+        VALUES (#{personId}, #{title}, #{journal}, #{indexCode}, #{publishDate}, #{doi}, #{filePath}, #{remark})
     </insert>
 
     <update id="update">
         UPDATE research_paper
         SET person_id=#{personId}, title=#{title}, journal=#{journal},
-            index_code=#{indexCode}, publish_date=#{publishDate}, doi=#{doi}, remark=#{remark}
+            index_code=#{indexCode}, publish_date=#{publishDate}, doi=#{doi},
+            file_path=#{filePath}, remark=#{remark}
         WHERE id=#{id}
     </update>
 

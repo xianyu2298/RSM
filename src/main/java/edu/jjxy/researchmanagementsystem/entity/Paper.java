@@ -12,6 +12,7 @@ public class Paper {
     private String indexCode;     // EI/SCI/CORE/NORMAL (字典)
     private LocalDate publishDate;
     private String doi;
+    private String filePath;
     private String remark;
     private String empNo;
     private String personName;

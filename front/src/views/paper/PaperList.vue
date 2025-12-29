@@ -19,10 +19,24 @@
       </el-table-column>
 
       <el-table-column prop="title" label="标题" min-width="260" />
-      <el-table-column prop="journal" label="期刊/会议" width="160" />
-      <el-table-column prop="indexCode" label="检索源" width="120" />
+      <el-table-column prop="journal" label="期刊/会议" width="160">
+        <template #default="{ row }">
+          {{ dictName('PAPER_JOURNAL', row.journal) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="indexCode" label="检索源" width="120">
+        <template #default="{ row }">
+          {{ dictName('PAPER_INDEX_SOURCE', row.indexCode) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="publishDate" label="发表日期" width="120" />
       <el-table-column prop="doi" label="DOI" width="160" />
+      <el-table-column label="附件" width="100">
+        <template #default="{ row }">
+          <el-link v-if="row.filePath" type="primary" :href="`/api/file/download/${row.filePath}`" target="_blank">下载</el-link>
+          <span v-else style="color:#999">无</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <div v-if="isAdmin || row.personId === currentUser.id">
@@ -83,7 +97,9 @@
       </el-form-item>
 
       <el-form-item label="期刊/会议">
-        <el-input v-model="form.journal" />
+        <el-select v-model="form.journal" style="width:100%" clearable>
+          <el-option v-for="i in journalItems" :key="i.itemCode" :label="i.itemName" :value="i.itemCode" />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="检索源">
@@ -98,6 +114,23 @@
 
       <el-form-item label="DOI">
         <el-input v-model="form.doi" placeholder="例如：10.1000/demo" />
+      </el-form-item>
+
+      <el-form-item label="附件">
+        <el-upload
+          action="/api/file/upload"
+          :on-success="handleUploadSuccess"
+          :before-upload="beforeUpload"
+          :limit="1"
+          :file-list="fileList"
+        >
+          <el-button type="primary">点击上传</el-button>
+          <template #tip>
+            <div class="el-upload__tip" v-if="form.filePath">
+              已上传: {{ form.filePath }}
+            </div>
+          </template>
+        </el-upload>
       </el-form-item>
 
       <el-form-item label="备注">
@@ -130,6 +163,8 @@ const total = ref(0)
 const rows = ref([])
 
 const indexItems = ref([])
+const journalItems = ref([])
+const fileList = ref([])
 
 const dlg = reactive({ visible: false, title: '' })
 const form = reactive({
@@ -140,15 +175,30 @@ const form = reactive({
   indexCode: '',
   publishDate: '',
   doi: '',
+  filePath: '',
   remark: ''
 })
 
 const personOptions = ref([])
 const personLoading = ref(false)
 
+function dictName(typeCode, itemCode) {
+  if (!itemCode) return '-'
+  let items = []
+  if (typeCode === 'PAPER_INDEX_SOURCE') {
+    items = indexItems.value || []
+  } else if (typeCode === 'PAPER_JOURNAL') {
+    items = journalItems.value || []
+  }
+  const it = items.find(i => i.itemCode === itemCode)
+  return it ? it.itemName : itemCode
+}
+
 async function loadDict() {
   // 论文检索源字典：EI/SCI/核心/一般
   indexItems.value = await dictItems('PAPER_INDEX_SOURCE')
+  // 期刊会议字典
+  journalItems.value = await dictItems('PAPER_JOURNAL')
 }
 
 async function load() {
@@ -169,10 +219,28 @@ function reset() {
   load()
 }
 
+function handleUploadSuccess(res) {
+  if (res.code === 0) {
+    form.filePath = res.data
+    ElMessage.success('文件上传成功')
+  } else {
+    ElMessage.error('文件上传失败: ' + res.msg)
+  }
+}
+
+function beforeUpload(file) {
+  const isLt20M = file.size / 1024 / 1024 < 20
+  if (!isLt20M) {
+    ElMessage.error('上传文件大小不能超过 20MB!')
+  }
+  return isLt20M
+}
+
 function openAdd() {
   dlg.title = '新增论文'
   dlg.visible = true
   personOptions.value = []
+  fileList.value = []
   Object.assign(form, {
     id: null,
     personId: isAdmin ? null : currentUser.id,
@@ -181,6 +249,7 @@ function openAdd() {
     indexCode: '',
     publishDate: '',
     doi: '',
+    filePath: '',
     remark: ''
   })
 }
@@ -189,6 +258,7 @@ function openEdit(row) {
   dlg.title = '编辑论文'
   dlg.visible = true
   Object.assign(form, row)
+  fileList.value = row.filePath ? [{ name: row.filePath, url: row.filePath }] : []
   personOptions.value = row.personId
     ? [{
       id: row.personId,
